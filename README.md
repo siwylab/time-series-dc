@@ -1,2 +1,2 @@
 # time-series-dc
-Python script for fitting masks and extracting patterns in deformability cytometry data.
+Python scripts for fitting masks and extracting patterns in deformability cytometry data.
