@@ -11,6 +11,8 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras import layers
 from tensorflow.python.client import device_lib
 
+#Interesting update
+
 # Load data from format script
 x = np.load('x_data_ellipse2.npy')
 y = np.load('y_data_ellipse2.npy')
