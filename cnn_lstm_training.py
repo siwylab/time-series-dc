@@ -11,10 +11,13 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras import layers
 from tensorflow.python.client import device_lib
 
+#Interesting update
+
 # Load data from format script
 x = np.load('x_data_ellipse2.npy')
 y = np.load('y_data_ellipse2.npy')
 
+# Split into train, val, test
 lstm_x_train, lstm_x_val, lstm_y_train, lstm_y_val = train_test_split(x, y, test_size=0.3, random_state=123)
 lstm_x_val, lstm_x_test, lstm_y_val, lstm_y_test = train_test_split(lstm_x_val, lstm_y_val, test_size=0.5, random_state=321)
 
@@ -26,7 +29,7 @@ def create_model(input_shape):
     model = models.Sequential()
     model.add(
         TimeDistributed(
-            layers.Conv2D(8, (3, 3), activation='relu'), 
+            layers.Conv2D(8, (3, 3), activation='relu'),
             input_shape=input_shape
         )
     ) # Add in position scalar
@@ -38,7 +41,7 @@ def create_model(input_shape):
     model.add(TimeDistributed(layers.Conv2D(16, (3,3), activation='relu')))
     model.add(TimeDistributed(layers.MaxPooling2D((2, 2), strides=(2, 2))))
 
-    # extract features and dropout 
+    # extract features and dropout
     model.add(TimeDistributed(layers.Flatten()))
     model.add(layers.Dropout(0.4))
 
