@@ -46,7 +46,7 @@ from cells import cells56 as cells
 
 PORE_STATS_BASE_DIRECTORY = 'C://Users//codyt//Documents//repos//pore_stats//pore_stats'
 
-sys.path.append(ROOT_DIR+'/oi')
+sys.path.append(ROOT_DIR+'/oi_3')
 import optical_imaging as oi
 import oi_file
 import image_processing 
