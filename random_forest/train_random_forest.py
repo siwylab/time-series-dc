@@ -17,11 +17,30 @@ x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
 
 # Split test and train data
-x_train_t, x_test_t, y_train_t, y_test_t = train_test_split(x, y, test_size=0.25, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.25, random_state=123)
+
+score = {}
 
 depth = np.arange(1, 30, 5)
 for d in depth:
-    clf = RandomForestClassifier(max_depth=5, criterion='gini', random_state=0)
-    clf.fit(x_train_t, y_train_t)
+    clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
+    clf.fit(x_train, y_train)
+    score[str(d)] = clf.score(x_val, y_val)
 
-# TODO Finish hyperparam looping and add performance plotting
+# Choose depth with best validation score
+d = max(score)
+
+# Report accuracy using 5-fold CV
+kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
+cv_score = []
+for train_index, test_index in kf.split(x):
+    x_train, x_test = x[train_index], x[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
+    clf.fit(x_train, y_train)
+    cv_score.append(clf.score(x_test, y_test))
+print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
+
+sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
+plt.title('RF' + 'D: ' + str(d))
+plt.savefig('svm_roc.png', dpi=300)

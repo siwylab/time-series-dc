@@ -16,8 +16,7 @@ feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0
 x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
 
-# Cross validation
-kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
+
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
@@ -46,6 +45,7 @@ print('Optimized hyper params:')
 print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
 
 # Report accuracy using 5-fold CV
+kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
 cv_score = []
 for train_index, test_index in kf.split(x_std):
     x_train, x_test = x_std[train_index], x_std[test_index]
@@ -56,5 +56,5 @@ for train_index, test_index in kf.split(x_std):
 print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
 
 sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test)
-plt.title('SVM' + 'C: '+ c + ' Kernel: ', k, '\n', 'D: ', d, '\n')
+plt.title('SVM' + 'C: ' + c + ' Kernel: ' + k + ' D: ' + d)
 plt.savefig('svm_roc.png', dpi=300)
