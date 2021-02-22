@@ -1,5 +1,4 @@
 import sklearn
-from sklearn import svm
 import numpy as np
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -21,26 +20,21 @@ scalar = sklearn.preprocessing.StandardScaler()
 x_std = scalar.fit_transform(x)
 x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.25, random_state=123)
 
-score = {}
 # Grid search all hyperparameters
-c_list = np.linspace(0.1, 1.5, 10)
-degree = np.arange(1, 10)
-k_list = ['linear', 'poly', 'rbf', 'sigmoid']
-for c in c_list:
-    for k in k_list:
-        if k == 'poly':
-            for d in degree:
-                svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123)
-                svm_clf.fit(x_train, y_train)
-                score[(str(c), k, str(d))] = svm_clf.score(x_val, y_val)
-        svm_clf = svm.SVC(C=c, kernel=k, random_state=123)
-        svm_clf.fit(x_train, y_train)
-        score[(str(c), k, 'N/A')] = svm_clf.score(x_val, y_val)
+leaf_size = list(range(1, 200, 5))
+neighbors = np.arange(1, 25)
+score = {}
+for leaf in leaf_size:
+    for n in neighbors:
+        clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors=n, leaf_size=leaf)
+        clf.fit(x_train, y_train)
+        score[(str(n), str(leaf))] = clf.score(x_val, y_val)
+
 
 # Select best weights
-c, k, d = max(score)
+n, leaf = max(score)
 print('Optimized hyper params:')
-print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
+print('N: ', n, '\n', 'Leaf size: ', leaf)
 
 # Report accuracy using 5-fold CV
 kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
@@ -48,11 +42,11 @@ cv_score = []
 for train_index, test_index in kf.split(x_std):
     x_train, x_test = x_std[train_index], x_std[test_index]
     y_train, y_test = y[train_index], y[test_index]
-    svm_clf = sklearn.svm.SVC(C=c, kernel=k, degree=d, random_state=123)
-    svm_clf.fit(x_train, y_train)
-    cv_score.append(svm_clf.score(x_test, y_test))
+    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors=n, leaf_size=leaf)
+    clf.fit(x_train, y_train)
+    cv_score.append(clf.score(x_test, y_test))
 print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
 
-sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test)
-plt.title('SVM' + 'C: ' + c + ' Kernel: ' + k + ' D: ' + d)
-plt.savefig('svm_roc.png', dpi=300)
+sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
+plt.title('k Nearest Neighbors' + 'K: ' + str(n) + ' Leaf Size: ' + str(leaf))
+plt.savefig('knn_roc.png', dpi=300)
