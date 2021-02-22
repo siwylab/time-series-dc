@@ -50,3 +50,5 @@ print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('k Nearest Neighbors' + 'K: ' + str(n) + ' Leaf Size: ' + str(leaf))
 plt.savefig('knn_roc.png', dpi=300)
+
+# TODO: Change data stratification to train/val/test for all models
