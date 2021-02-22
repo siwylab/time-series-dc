@@ -1,5 +1,4 @@
 import sklearn
-from sklearn import svm
 import numpy as np
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -27,20 +26,14 @@ c_list = np.linspace(0.1, 1.5, 10)
 degree = np.arange(1, 10)
 k_list = ['linear', 'poly', 'rbf', 'sigmoid']
 for c in c_list:
-    for k in k_list:
-        if k == 'poly':
-            for d in degree:
-                svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123)
-                svm_clf.fit(x_train, y_train)
-                score[(str(c), k, str(d))] = svm_clf.score(x_val, y_val)
-        svm_clf = svm.SVC(C=c, kernel=k, random_state=123)
-        svm_clf.fit(x_train, y_train)
-        score[(str(c), k, 'N/A')] = svm_clf.score(x_val, y_val)
+    clf = sklearn.linear_model.LogisticRegression(C=c, random_state=123)
+    clf.fit(x_train, y_train)
+    score[str(c)] = clf.score(x_val, y_val)
 
 # Select best weights
-c, k, d = max(score)
+c = max(score)
 print('Optimized hyper params:')
-print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
+print('C: ', c)
 
 # Report accuracy using 5-fold CV
 kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
@@ -48,11 +41,11 @@ cv_score = []
 for train_index, test_index in kf.split(x_std):
     x_train, x_test = x_std[train_index], x_std[test_index]
     y_train, y_test = y[train_index], y[test_index]
-    svm_clf = sklearn.svm.SVC(C=c, kernel=k, degree=d, random_state=123)
-    svm_clf.fit(x_train, y_train)
-    cv_score.append(svm_clf.score(x_test, y_test))
+    clf = sklearn.linear_model.LogisticRegression(C=c, random_state=123)
+    clf.fit(x_train, y_train)
+    cv_score.append(clf.score(x_test, y_test))
 print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
 
-sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test)
-plt.title('SVM' + 'C: ' + c + ' Kernel: ' + k + ' D: ' + d)
-plt.savefig('svm_roc.png', dpi=300)
+sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
+plt.title('Logistic Regression' + 'C: ' + c)
+plt.savefig('logistic_regression_roc.png', dpi=300)

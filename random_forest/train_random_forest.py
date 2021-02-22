@@ -43,4 +43,4 @@ print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('RF' + 'D: ' + str(d))
-plt.savefig('svm_roc.png', dpi=300)
+plt.savefig('random_forest_roc.png', dpi=300)
