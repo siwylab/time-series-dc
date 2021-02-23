@@ -11,6 +11,10 @@ df['x_end'] = df.apply(lambda a: np.argmin(np.abs(180-a['xcm_um'])), axis=1)
 
 def pad_columns(columns, df):
     max_length = 35
+    # Default value for data_outer
+    data_outer = df
+
+    # Enumerate over columns, align and pad selected sequences while ignoring nans
     for i, column in enumerate(columns):
         for ii, data in enumerate(df[column]):
             # Skip erroneously long rows

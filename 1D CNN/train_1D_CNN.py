@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import layers
-import numpy as np
 import os
+import numpy as np
 
 # Load dataset
 df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/Full_filt_101_cx_el.pkl')
@@ -24,18 +24,12 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 
 def create_model():
     _model = tf.keras.models.Sequential()
-    _model.add(layers.Masking(input_shape=x_train.shape[1:]))
-    # model.add(tf.keras.Input(shape=(lstm_x_train.shape[1],)))
-#     model.add(
-#         layers.LSTM(55, return_sequences=True )
-#     )
-#     model.add(
-#         layers.LSTM(55, return_sequences=True )
-#     )
-    _model.add(layers.LSTM(55))
-#     model.add(layers.Dense(24, activation='relu'))
-    _model.add(layers.Dense(24, activation='relu'))
-    # model.add(layers.Dense(24, activation='relu'))
+    _model.add(tf.keras.Input(shape=(None, 35, 4)))
+    _model.add(layers.Conv1D(16, 10, activation='relu'))
+    _model.add(layers.Conv1D(16, 10, activation='relu'))
+    _model.add(layers.Conv1D(16, 10, activation='relu'))
+    _model.add(layers.Dense(16, activation='relu'))
+    _model.add(layers.Dense(16, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
     _model.compile(optimizer='rmsprop',
                    loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
@@ -65,8 +59,7 @@ plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.ylim([0.5, 1])
 plt.legend(loc='lower right')
-plt.savefig('lstm_training.png', dpi=300)
-
+plt.savefig('1D_CNN_training.png', dpi=300)
 
 # Create base model and load best validation weights
 cp = np.argmax(history.history['val_accuracy'])
@@ -74,3 +67,4 @@ val_model = create_model()
 model.load_weights('cp-' + str.zfill(str(cp), 4) + '.ckpt')
 test_acc = model.evaluate(x_test, y_test)[1]
 print(test_acc)
+
