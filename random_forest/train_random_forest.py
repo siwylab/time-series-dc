@@ -17,7 +17,8 @@ x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
 
 # Split test and train data
-x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.25, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
+x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 score = {}
 
@@ -30,16 +31,12 @@ for d in depth:
 # Choose depth with best validation score
 d = max(score)
 
-# Report accuracy using 5-fold CV
-kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
-cv_score = []
-for train_index, test_index in kf.split(x):
-    x_train, x_test = x[train_index], x[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
-    clf.fit(x_train, y_train)
-    cv_score.append(clf.score(x_test, y_test))
-print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
+# Report accuracy using test set
+print('Optimized hyper params:')
+print('Depth: ', d)
+clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
+clf.fit(x_train, y_train)
+print(clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('RF' + 'D: ' + str(d))
