@@ -53,10 +53,10 @@ def calc_v(x_pos,fps=11103):
 def region1(xpos,asp):
 
   asp1_max =  np.max(asp[(xpos>0)&(xpos<50)])
-  asp1_arg = np.where(asp==asp1_max)
+  asp1_arg = np.where(asp==asp1_max)[0][0]
 
   asp2_min =  np.min(asp[(xpos>50)&(xpos<100)])
-  asp2_arg = np.where(asp==asp2_min)
+  asp2_arg = np.where(asp==asp2_min)[0][0]
 
   return [xpos[asp1_arg:asp2_arg+1],asp[asp1_arg:asp2_arg+1]]
 
