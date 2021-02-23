@@ -53,22 +53,22 @@ def calc_v(x_pos,fps=11103):
 def region1(xpos,asp):
 
   asp1_max =  np.max(asp[(xpos>0)&(xpos<50)])
-  asp1_arg = np.where(asp==asp_max)
+  asp1_arg = np.where(asp==asp1_max)
 
   asp2_min =  np.min(asp[(xpos>50)&(xpos<100)])
   asp2_arg = np.where(asp==asp2_min)
 
-  return [xpos[asp1_arg:asp2_arg],asp[asp1_arg:asp2_arg]]
+  return [xpos[asp1_arg:asp2_arg+1],asp[asp1_arg:asp2_arg+1]]
 
 def region2(xpos,asp):
 
   asp1_max =  np.nanmax(asp[(xpos>100)&(xpos<150)])
-  asp1_arg = np.where(asp==asp_max)
+  asp1_arg = np.where(asp==asp1_max)
 
   asp2_min =  np.nanmin(asp[(xpos>150)&(xpos<170)])
   asp2_arg = np.where(asp==asp2_min)
 
-  return [xpos[asp1_arg:asp2_arg],asp[asp1_arg:asp2_arg]]
+  return [xpos[asp1_arg:asp2_arg+1],asp[asp1_arg:asp2_arg+1]]
 
 def fit_poly(asp,xpos,degree=1):
   
