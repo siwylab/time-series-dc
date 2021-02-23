@@ -35,22 +35,25 @@ import image_processing
 #Pass df to filter out based on y position, area to convex hull ratio, and radius
 #DF must have full calculations complete
 def filter_df(df,ymax=5,max_ar = 1.05,radius_std = 3):
-	
+
 	y_hist =[]
 	for idx, row in df.iterrows():
-	    y = row.yc_um_el
-	    y_cav = y[row.cav_idx]
-	    y_avg = y_cav.mean()
-	    y_hist.append(y_avg)
+		y = row.yc_um_el
+		y_cav = y[row.cav_idx]
+		y_avg = y_cav.mean()
+		y_hist.append(y_avg)
 
-	df = df[np.abs(df.y_hist)<ymax]
+	df = df[np.abs(y_hist)<ymax]
 
 	#filter by area ratio
 	area_ratio =[]
+
 	for idx, row in df.iterrows():
-    	area = row.area
-    	area_cx = row.area_cx
-    	area_ratio.append(np.all(area_cx/area<max_ar))
+
+		area = row.area
+		area_cx = row.area_cx
+		area_ratio.append(np.all(area_cx/area<max_ar))
+
 	df = df[area_ratio]
 
 	#filter by radius
@@ -60,23 +63,17 @@ def filter_df(df,ymax=5,max_ar = 1.05,radius_std = 3):
 
 	return df
 
-#filter data for going through channel
+	#filter data for going through channel
 def filter_enter_exit(df):
 
 
 	enter_exit = []
 	for index, row in df.iterrows():
-    
-	    enter = row.xcm_um<0
-	    inside = (row.xcm_um>0)&(row.xcm_um<150)
-	    exit = row.xcm_um>150
-	    enter_exit.append(np.any(enter)&(np.any(inside))&(np.any(exit)))
-    
-    
+
+		enter = row.xcm_um<0
+		inside = (row.xcm_um>0)&(row.xcm_um<150)
+		exit = row.xcm_um>150
+		enter_exit.append(np.any(enter)&(np.any(inside))&(np.any(exit)))
+
+
 	return df[enter_exit]
-
-
-
-	
-
-
