@@ -52,10 +52,10 @@ def calc_v(x_pos,fps=11103):
 
 def region1(xpos,asp):
 
-  asp1_max =  np.max(asp[(xpos>0)&(xpos<50)])
+  asp1_max =  np.nanmax(asp[(xpos>0)&(xpos<50)])
   asp1_arg = np.where(asp==asp1_max)[0][0]
 
-  asp2_min =  np.min(asp[(xpos>50)&(xpos<100)])
+  asp2_min =  np.nanmin(asp[(xpos>50)&(xpos<100)])
   asp2_arg = np.where(asp==asp2_min)[0][0]
 
   return [xpos[asp1_arg:asp2_arg+1],asp[asp1_arg:asp2_arg+1]]
@@ -63,16 +63,16 @@ def region1(xpos,asp):
 def region2(xpos,asp):
 
   asp1_max =  np.nanmax(asp[(xpos>100)&(xpos<150)])
-  asp1_arg = np.where(asp==asp1_max)
+  asp1_arg = np.where(asp==asp1_max)[0][0]
 
   asp2_min =  np.nanmin(asp[(xpos>150)&(xpos<170)])
-  asp2_arg = np.where(asp==asp2_min)
+  asp2_arg = np.where(asp==asp2_min)[0][0]
 
   return [xpos[asp1_arg:asp2_arg+1],asp[asp1_arg:asp2_arg+1]]
 
-def fit_poly(asp,xpos,degree=1):
+def fit_poly(data,degree=1):
   
-  fit = np.polyfit(xpos,asp,degree)
+  fit = np.polyfit(data[0],data[1],degree)
 
   return fit
 
@@ -101,14 +101,14 @@ def calc_features(df):
   df['cav1_min_arg'] = df.apply(lambda a: np.where(a.aspect == a.cav1_asp),axis=1)
 
 
-  df['t_poly1'] = df.apply(lambda a: fit_poly(region1(a.tf,a.aspect)),axis=1)
-  df['t_poly2'] = df.apply(lambda a: fit_poly(region2(a.tf,a.aspect)),axis=1)
+  #df['t_poly1'] = df.apply(lambda a: fit_poly(region1(a.tf,a.aspect)),axis=1)
+  #df['t_poly2'] = df.apply(lambda a: fit_poly(region2(a.tf,a.aspect)),axis=1)
 
   df['x_poly1'] = df.apply(lambda a: fit_poly(region1(a.xcm_um,a.aspect)),axis=1)
   df['x_poly2'] = df.apply(lambda a: fit_poly(region2(a.xcm_um,a.aspect)),axis=1)
 
-  df['region1_dx'] = df.apply(lambda a: np.abs(a.xcm_um[nar1_max_arg]-a.xcm_um[cav1_min_arg]) ,axis=1)
-  df['region1_dt'] = df.apply(lambda a: np.abs(a.tf[nar1_max_arg]-a.tf[cav1_min_arg]) ,axis=1)
+  df['region1_dx'] = df.apply(lambda a: np.abs(a.xcm_um[a.nar1_max_arg]-a.xcm_um[a.cav1_min_arg]) ,axis=1)
+  df['region1_dt'] = df.apply(lambda a: np.abs(a.tf[a.nar1_max_arg]-a.tf[a.cav1_min_arg]) ,axis=1)
 
   df['region1_dasp'] = df['nar1_asp'] - df['cav1_asp']
 
