@@ -199,7 +199,7 @@ for i in range(len(date_ar)):
     event_file_path = data_base_path + date +'/'+ particle_type + channel_type + '/oi/'+ file_index+'/events/cell_events_101x56_2.pkl'
     output_file_path = data_base_path + date +'/'+ particle_type + channel_type + '/oi/'+ file_index + '/df/'
     
-    if os.path.isfile(output_file_path + 'calcs101x56_2'):
+    if os.path.isfile(output_file_path + 'calcs101x56_2_xc_fixed'):
         continue
         
     oi_vid = oi_file.Video(vid_file_path, res_x, res_y, fps, exp,camera=camera)
@@ -209,7 +209,9 @@ for i in range(len(date_ar)):
     
 
     oi_stage = oi.Stage(template_frame, cs[0], cs[1], cs[2], cs[3])
-    
+
+    print('Currently calculating: ' +  vid_file_path )
+
     df = calculate_df(event_file_path,oi_stage)
     
     if not os.path.isdir(output_file_path):
