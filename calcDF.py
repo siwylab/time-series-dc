@@ -29,11 +29,12 @@ import optical_imaging as oi
 import oi_file
 import image_processing 
 
-#Calculate postion and deformation from mask. Input is dataframe (.pkl) from event_detection_mrcnn and stage file
+
+# Calculate position and deformation from mask. Input is dataframe (.pkl) from event_detection_mrcnn and stage file
 def calculate_df(event_path,oi_stage):
 
     
-    #initialize lists to hold data across events
+    # initialize lists to hold data across events
     mask_array = []
     time_array = []
     perimeter_array = []
@@ -84,8 +85,7 @@ def calculate_df(event_path,oi_stage):
         ellipse_b = np.empty(num)
         aspect = np.empty(num)
         r_um_elps = np.empty(num)
-        
-        
+
         for i in range(num):
 
             frame = np.reshape(df_raw[j]['mask'][i],(140,880))

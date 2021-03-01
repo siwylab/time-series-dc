@@ -18,7 +18,8 @@ y = df[['y']].to_numpy()
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
 x_std = scalar.fit_transform(x)
-x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.25, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.3, random_state=123)
+x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 # Grid search all hyperparameters
 leaf_size = list(range(1, 200, 5))
@@ -35,20 +36,12 @@ for leaf in leaf_size:
 n, leaf = max(score)
 print('Optimized hyper params:')
 print('N: ', n, '\n', 'Leaf size: ', leaf)
-
-# Report accuracy using 5-fold CV
-kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
-cv_score = []
-for train_index, test_index in kf.split(x_std):
-    x_train, x_test = x_std[train_index], x_std[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors=n, leaf_size=leaf)
-    clf.fit(x_train, y_train)
-    cv_score.append(clf.score(x_test, y_test))
-print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
+clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors=n, leaf_size=leaf)
+clf.fit(x_train, y_train)
+print(clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('k Nearest Neighbors' + 'K: ' + str(n) + ' Leaf Size: ' + str(leaf))
 plt.savefig('knn_roc.png', dpi=300)
 
-# TODO: Change data stratification to train/val/test for all models
+

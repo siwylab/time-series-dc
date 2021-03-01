@@ -19,7 +19,8 @@ y = df[['y']].to_numpy()
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
 x_std = scalar.fit_transform(x)
-x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.25, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.3, random_state=123)
+x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 score = {}
 # Grid search all hyperparameters
@@ -41,17 +42,9 @@ for c in c_list:
 c, k, d = max(score)
 print('Optimized hyper params:')
 print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
-
-# Report accuracy using 5-fold CV
-kf = sklearn.model_selection.KFold(n_splits=5, random_state=123, shuffle=True)
-cv_score = []
-for train_index, test_index in kf.split(x_std):
-    x_train, x_test = x_std[train_index], x_std[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    svm_clf = sklearn.svm.SVC(C=c, kernel=k, degree=d, random_state=123)
-    svm_clf.fit(x_train, y_train)
-    cv_score.append(svm_clf.score(x_test, y_test))
-print(np.mean(cv_score)*100, ' +-', np.std(cv_score)*100)
+svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123)
+svm_clf.fit(x_train, y_train)
+print(svm_clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test)
 plt.title('SVM' + 'C: ' + c + ' Kernel: ' + k + ' D: ' + d)
