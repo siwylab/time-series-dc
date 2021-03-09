@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 # Load dataset
-df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/Full_filt_101_cx_el.pkl')
+df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
 
 feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
                 'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
