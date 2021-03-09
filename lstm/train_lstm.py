@@ -2,17 +2,14 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow import layers
+from tensorflow.keras import layers
 import numpy as np
 import os
+import sklearn
 
 # Load dataset
-df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/Full_filt_101_cx_el.pkl')
-
-feature_list = ['padded_aspect', 'padded_perimeter', 'padded_area', 'padded_deform']
-
-x = df[feature_list].to_numpy()
-y = df[['y']].to_numpy()
+x = np.load('/home/dan/Documents/siwylab/AWS/sequential_x.npy')
+y = np.load('/home/dan/Documents/siwylab/AWS/sequential_y.npy')
 
 # Split test and train data
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
@@ -74,3 +71,14 @@ val_model = create_model()
 model.load_weights('cp-' + str.zfill(str(cp), 4) + '.ckpt')
 test_acc = model.evaluate(x_test, y_test)[1]
 print(test_acc)
+
+pred = model.predict(y_test).ravel()
+fpr, tpr, _ = sklearn.metrics.roc(y_test, pred)
+auc = sklearn.metrics.auc(fpr, tpr)
+plt.plot(fpr, tpr, label='LSTM' + ' (AUC: ' + str(round(auc, 2)) + ')')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.title('ROC Curve')
+plt.legend(loc='best')
+plt.savefig('lstm_roc.png', dpi=300)

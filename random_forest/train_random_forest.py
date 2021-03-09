@@ -30,7 +30,7 @@ for d in depth:
     score[str(d)] = clf.score(x_val, y_val)
 
 # Choose depth with best validation score
-d = max(score)
+d = max(score, key=lambda key: score[key])
 
 # Report accuracy using test set
 print('Optimized hyper params:')

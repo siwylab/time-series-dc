@@ -32,7 +32,7 @@ for c in c_list:
     score[str(c)] = clf.score(x_val, y_val)
 
 # Select best weights
-c = max(score)
+c = max(score, key=lambda key: score[key])
 print('Optimized hyper params:')
 print('C: ', c)
 

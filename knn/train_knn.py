@@ -35,7 +35,7 @@ for leaf in leaf_size:
         score[(str(n), str(leaf))] = clf.score(x_val, y_val)
 
 # Select best weights
-n, leaf = max(score)
+n, leaf = max(score, key=lambda key: score[key])
 
 print('Optimized hyper params:')
 print('N: ', n, '\n', 'Leaf size: ', leaf)

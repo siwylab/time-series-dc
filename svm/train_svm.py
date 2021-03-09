@@ -38,9 +38,10 @@ for c in c_list:
         svm_clf = svm.SVC(C=c, kernel=k, random_state=123, probability=True)
         svm_clf.fit(x_train, y_train.ravel())
         score[(str(c), k, 'N/A')] = svm_clf.score(x_val, y_val)
-
+for key in score:
+    print(key, score[key])
 # Select best weights
-c, k, d = max(score)
+c, k, d = max(score, key=lambda key: score[key])
 c = float(c)
 if d == 'N/A':
     d = 0

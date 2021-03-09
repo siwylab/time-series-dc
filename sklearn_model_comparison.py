@@ -31,13 +31,14 @@ for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
     current_dir = os.getcwd()
     model_dir = os.path.join(current_dir, rel_dir, rel_dir+'.pkl')
     # Load model
-    model = pickle.load(model_dir)
+    with open(model_dir, 'rb') as pkl_file:
+        model = pickle.load(pkl_file)
 
     # Obtain fpr, tpr
-    fpr_svm, tpr_svm, _ = sklearn.metrics.roc_curve(y_test, model.predict_proba(x_test)[:, 1])
+    fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, model.predict_proba(x_test)[:, 1])
     auc = sklearn.metrics.roc_auc_score(y_test, model.predict_proba(x_test)[:, 1])
-    plt.plot(fpr_svm, tpr_svm, label=rel_dir + ' (' + str(round(auc, 2)) + ')')
-plt.plot([0, 1], [1, 0], 'k--')
+    plt.plot(fpr, tpr, label=rel_dir + ' (AUC: ' + str(round(auc, 2)) + ')')
+plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate')
 plt.ylabel('True positive rate')
 plt.title('ROC Curve')
