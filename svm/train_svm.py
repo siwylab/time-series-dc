@@ -1,3 +1,4 @@
+import pickle
 import sklearn
 from sklearn import svm
 import numpy as np
@@ -31,10 +32,10 @@ for c in c_list:
     for k in k_list:
         if k == 'poly':
             for d in degree:
-                svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123)
+                svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123, probability=True)
                 svm_clf.fit(x_train, y_train)
                 score[(str(c), k, str(d))] = svm_clf.score(x_val, y_val)
-        svm_clf = svm.SVC(C=c, kernel=k, random_state=123)
+        svm_clf = svm.SVC(C=c, kernel=k, random_state=123, probability=True)
         svm_clf.fit(x_train, y_train)
         score[(str(c), k, 'N/A')] = svm_clf.score(x_val, y_val)
 
@@ -42,10 +43,12 @@ for c in c_list:
 c, k, d = max(score)
 print('Optimized hyper params:')
 print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
-svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123)
+svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123, probability=True)
 svm_clf.fit(x_train, y_train)
 print(svm_clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test)
 plt.title('SVM' + 'C: ' + c + ' Kernel: ' + k + ' D: ' + d)
 plt.savefig('svm_roc.png', dpi=300)
+
+pickle.dump(svm_clf, open('svm.pkl', 'wb'))

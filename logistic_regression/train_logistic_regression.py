@@ -1,3 +1,4 @@
+import pickle
 import sklearn
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -41,3 +42,5 @@ print(clf.score(x_test, y_test))
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('Logistic Regression' + 'C: ' + c)
 plt.savefig('logistic_regression_roc.png', dpi=300)
+
+pickle.dump(clf, open('logistic_regression.pkl', 'wb'))

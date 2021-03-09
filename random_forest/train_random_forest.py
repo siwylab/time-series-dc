@@ -1,3 +1,4 @@
+import pickle
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
@@ -41,3 +42,5 @@ print(clf.score(x_test, y_test))
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
 plt.title('RF' + 'D: ' + str(d))
 plt.savefig('random_forest_roc.png', dpi=300)
+
+pickle.dump(clf, open('random_forest.pkl', 'wb'))
