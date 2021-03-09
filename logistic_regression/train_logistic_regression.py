@@ -1,6 +1,7 @@
 import pickle
 import sklearn
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,8 +27,8 @@ score = {}
 # Grid search all hyperparameters
 c_list = np.linspace(0.1, 1.5, 10)
 for c in c_list:
-    clf = sklearn.linear_model.LogisticRegression(C=c, random_state=123)
-    clf.fit(x_train, y_train)
+    clf = LogisticRegression(C=c, random_state=123)
+    clf.fit(x_train, y_train.ravel())
     score[str(c)] = clf.score(x_val, y_val)
 
 # Select best weights
@@ -35,12 +36,12 @@ c = max(score)
 print('Optimized hyper params:')
 print('C: ', c)
 
-clf = sklearn.linear_model.LogisticRegression(C=c, random_state=123)
-clf.fit(x_train, y_train)
+clf = LogisticRegression(C=float(c), random_state=123)
+clf.fit(x_train, y_train.ravel())
 print(clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
-plt.title('Logistic Regression' + 'C: ' + c)
+plt.title('Logistic Regression' + ' C: ' + c)
 plt.savefig('logistic_regression_roc.png', dpi=300)
 
 pickle.dump(clf, open('logistic_regression.pkl', 'wb'))

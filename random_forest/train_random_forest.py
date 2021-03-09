@@ -26,7 +26,7 @@ score = {}
 depth = np.arange(1, 30, 5)
 for d in depth:
     clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
-    clf.fit(x_train, y_train)
+    clf.fit(x_train, y_train.ravel())
     score[str(d)] = clf.score(x_val, y_val)
 
 # Choose depth with best validation score
@@ -35,12 +35,12 @@ d = max(score)
 # Report accuracy using test set
 print('Optimized hyper params:')
 print('Depth: ', d)
-clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
-clf.fit(x_train, y_train)
+clf = RandomForestClassifier(max_depth=int(d), criterion='gini', random_state=123)
+clf.fit(x_train, y_train.ravel())
 print(clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
-plt.title('RF' + 'D: ' + str(d))
+plt.title('RF' + ' D: ' + str(d))
 plt.savefig('random_forest_roc.png', dpi=300)
 
 pickle.dump(clf, open('random_forest.pkl', 'wb'))
