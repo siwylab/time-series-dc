@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-import pandas as pd
+import shutil
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -42,7 +42,9 @@ def create_model():
 
 
 model = create_model()
-checkpoint_path = "training_2/cp-{epoch:04d}.ckpt"
+base_path = os.getcwd()
+shutil.rmtree('training_1/')
+checkpoint_path = "training_1/cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
@@ -64,6 +66,7 @@ plt.ylim([0.5, 1])
 plt.legend(loc='lower right')
 plt.savefig('lstm_training.png', dpi=300)
 
+os.chdir(os.path.join(base_path, 'training_1'))
 
 # Create base model and load best validation weights
 cp = np.argmax(history.history['val_accuracy'])
@@ -72,9 +75,15 @@ model.load_weights('cp-' + str.zfill(str(cp), 4) + '.ckpt')
 test_acc = model.evaluate(x_test, y_test)[1]
 print(test_acc)
 
+os.chdir(base_path)
 pred = model.predict(y_test).ravel()
 fpr, tpr, _ = sklearn.metrics.roc(y_test, pred)
 auc = sklearn.metrics.auc(fpr, tpr)
+
+# Save tpr and fpr for lstm model comparison script
+np.savetxt('fpr', fpr)
+np.savetxt('tpr', tpr)
+
 plt.plot(fpr, tpr, label='LSTM' + ' (AUC: ' + str(round(auc, 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate')
