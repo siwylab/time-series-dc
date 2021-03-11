@@ -17,8 +17,15 @@ feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0
 x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
 
-# Split test and train data
+# Normalize and standardize first
+scalar = sklearn.preprocessing.StandardScaler()
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
+
+# Fit scalar on training, apply transformation to val/test
+scalar.fit(x_train)
+x_train = scalar.transform(x_train)
+x_val = scalar.transform(x_val)
+
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 score = {}

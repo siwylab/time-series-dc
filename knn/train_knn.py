@@ -20,8 +20,13 @@ y = df[['y']].to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
-x_std = scalar.fit_transform(x)
-x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.3, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
+
+# Fit scalar on training, apply transformation to val/test
+scalar.fit(x_train)
+x_train = scalar.transform(x_train)
+x_val = scalar.transform(x_val)
+
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 # Grid search all hyperparameters

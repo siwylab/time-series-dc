@@ -22,17 +22,8 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 def create_model():
     _model = tf.keras.models.Sequential()
     _model.add(layers.Masking(input_shape=x_train.shape[1:]))
-    # model.add(tf.keras.Input(shape=(lstm_x_train.shape[1],)))
-#     model.add(
-#         layers.LSTM(55, return_sequences=True )
-#     )
-#     model.add(
-#         layers.LSTM(55, return_sequences=True )
-#     )
     _model.add(layers.LSTM(55))
-#     model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(24, activation='relu'))
-    # model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
     _model.compile(optimizer='rmsprop',
                    loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
@@ -65,7 +56,7 @@ plt.ylabel('Accuracy')
 plt.ylim([0.5, 1])
 plt.legend(loc='lower right')
 plt.savefig('lstm_training.png', dpi=300)
-
+plt.figure()
 os.chdir(os.path.join(base_path, 'training_1'))
 
 # Create base model and load best validation weights
@@ -76,15 +67,16 @@ test_acc = model.evaluate(x_test, y_test)[1]
 print(test_acc)
 
 os.chdir(base_path)
-pred = model.predict(y_test).ravel()
-fpr, tpr, _ = sklearn.metrics.roc(y_test, pred)
-auc = sklearn.metrics.auc(fpr, tpr)
+pred = model.predict(x_test).ravel()
+fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, pred)
+auc = np.expand_dims(sklearn.metrics.auc(fpr, tpr), -1)
 
 # Save tpr and fpr for lstm model comparison script
-np.savetxt('fpr', fpr)
-np.savetxt('tpr', tpr)
+np.savetxt('lstm_fpr.csv', fpr)
+np.savetxt('lstm_tpr.csv', tpr)
+np.savetxt('lstm_auc.csv', auc)
 
-plt.plot(fpr, tpr, label='LSTM' + ' (AUC: ' + str(round(auc, 2)) + ')')
+plt.plot(fpr, tpr, label='LSTM' + ' (AUC: ' + str(round(float(auc), 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate')
 plt.ylabel('True positive rate')
