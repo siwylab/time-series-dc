@@ -96,9 +96,9 @@ def calc_features(df):
   df['nar2_asp'] = df.apply(lambda a: np.nanmax(a.aspect[a.nar2_idx]),axis=1)
   df['cav1_asp'] = df.apply(lambda a: np.nanmin(a.aspect[a.cav_idx]),axis=1)
 
-  df['nar1_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar1_asp),axis=1)
-  df['nar2_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar2_asp),axis=1)
-  df['cav1_min_arg'] = df.apply(lambda a: np.where(a.aspect == a.cav1_asp),axis=1)
+  df['nar1_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar1_asp)[0][0],axis=1)
+  df['nar2_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar2_asp)[0][0],axis=1)
+  df['cav1_min_arg'] = df.apply(lambda a: np.where(a.aspect == a.cav1_asp)[0][0],axis=1)
 
 
   #df['t_poly1'] = df.apply(lambda a: fit_poly(region1(a.tf,a.aspect)),axis=1)
