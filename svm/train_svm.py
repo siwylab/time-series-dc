@@ -57,7 +57,7 @@ svm_clf.fit(x_train, y_train.ravel())
 print(svm_clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test.ravel())
-plt.title('SVM' + ' C: ' + str(c) + ' Kernel: ' + k + ' D: ' + str(d))
+plt.title('SVM' + ' C: ' + str(round(c,2)) + ' Kernel: ' + k + ' D: ' + str(d))
 plt.savefig('svm_roc.png', dpi=300)
 
 pickle.dump(svm_clf, open('svm.pkl', 'wb'))
