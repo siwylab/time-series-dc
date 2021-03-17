@@ -179,10 +179,10 @@ camera = 0
 
 #Define Videos for calculations
 data_base_path = 'D:/'
-date_ar =  ['10-8-20']*6 + ['11-3-20']*5+['11-5-20']*5
-particle_type_ar = ['hl60']*3+['hl60d']*3+['hl60']+['hl60d']*4+['hl60']*4+['hl60d']
+date_ar =  ['10-8-20']*6 + ['11-3-20']*5+['11-5-20']*5 + ['2-25-21']*4
+particle_type_ar = ['hl60']*3+['hl60d']*3+['hl60']+['hl60d']*4+['hl60']*4+['hl60d'] + ['hl60c']*4
 channel_type = '/25_50_25x150'
-file_index_ar = ['0','1','2']*2+['0']+['0','1','2','3']+['0','1','2','3']+['2']
+file_index_ar = ['0','1','2']*2+['0']+['0','1','2','3']+['0','1','2','3']+['2'] + ['0','1','2','3']
 
 assert len(date_ar)==len(particle_type_ar)==len(file_index_ar)
 
@@ -199,7 +199,7 @@ for i in range(len(date_ar)):
     event_file_path = data_base_path + date +'/'+ particle_type + channel_type + '/oi/'+ file_index+'/events/cell_events_101x56_2.pkl'
     output_file_path = data_base_path + date +'/'+ particle_type + channel_type + '/oi/'+ file_index + '/df/'
     
-    if os.path.isfile(output_file_path + 'calcs101x56_2'):
+    if os.path.isfile(output_file_path + 'calcs101x56_2_xc_fixed'):
         continue
         
     oi_vid = oi_file.Video(vid_file_path, res_x, res_y, fps, exp,camera=camera)
@@ -209,11 +209,13 @@ for i in range(len(date_ar)):
     
 
     oi_stage = oi.Stage(template_frame, cs[0], cs[1], cs[2], cs[3])
-    
+
+    print('Currently calculating: ' +  vid_file_path )
+
     df = calculate_df(event_file_path,oi_stage)
     
     if not os.path.isdir(output_file_path):
         os.mkdir(output_file_path)
-    df.to_pickle(output_file_path+'calcs101x56_2')
+    df.to_pickle(output_file_path+'calcs101x56_2_xc_fixed')
 
 
