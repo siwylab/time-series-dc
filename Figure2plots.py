@@ -210,6 +210,39 @@ def pop_means_sem(df,y_label,feat,output_path='D://',save=False):
 	else:
 		plt.show()
 
+def temp_sem(df,y_label,feat,output_path='D://',save=False):
+	
+	hlidx = df.cell == 'hl60'
+	hldidx = df.cell == 'hl60d'
+
+	x = ['HL 60','HL 60d']
+	y = [df[hlidx][feat].mean(),df[hldidx][feat].mean()]
+	e = [stats.sem(df[feat][hlidx]),stats.sem(df[feat][hldidx])]
+
+	temp_df = pd.DataFrame({'cell' : x, 'aspect' : y, 'sd_err' : e})
+
+	       
+	plt.errorbar([1,2], y, e, marker="o",linestyle='',markersize='6', capsize=4)
+
+
+
+
+	# place the ticks at center by widening the plot
+	plt.xlim((0, 3))
+	# fix ticks at the number encoding for each class
+	plt.xticks([1,2],['hl60','hl60d'])
+	# name the numbers
+	
+	plt.ylabel(y_label,size=20)
+	plt.xlabel('Cell',size=20)
+
+	#plt.ylim(1.2,1.5)
+	#plt.show()
+	if save:
+		plt.savefig(output_path)
+	else:
+		plt.show()
+
 
 def pop_violin(df,output_path, feat, save=False):
 
@@ -289,12 +322,17 @@ def heatmat_pop(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False):
 
 def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False):
 
-	fig, ax = plt.subplots(nrows=len(yfeat), ncols=2,sharex='none',sharey='row',figsize=(20,30))
+	#fig, ax = plt.subplots(nrows=len(yfeat), ncols=3,sharex='none',sharey='row',figsize=(20,30))
+
+	fig = plt.figure()
+
 
 	for row in range(len(yfeat)):
 
-		ax1 = ax[row,0]
-		ax2 = ax[row,1]
+		ax1 = fig.add_subplot(len(yfeat),3,1*(1+row))
+		ax2 = fig.add_subplot(len(yfeat),3,2*(1+row) ,sharey = ax1)
+		ax3 = fig.add_subplot(len(yfeat),3,3*(1+row))
+
 		x = df[df.cell=='hl60'][xfeat].to_numpy()
 		y = df[df.cell=='hl60'][yfeat[row]].to_numpy()
 
@@ -330,6 +368,26 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		ax2.annotate('n='+str(len(df[df.cell=='hl60d'])), xy=(.95, .9), xycoords='axes fraction', fontsize=16, 
 			xytext=(-5, 5), textcoords='offset points',
             ha='right', va='bottom')
+
+
+		hlidx = df.cell == 'hl60'
+		hldidx = df.cell == 'hl60d'
+
+		x = ['HL 60','HL 60d']
+		y = [df[hlidx][yfeat[row]].mean(),df[hldidx][yfeat[row]].mean()]
+		e = [stats.sem(df[yfeat[row]][hlidx]),stats.sem(df[yfeat[row]][hldidx])]
+     
+		ax3.errorbar([1,2], y, e, marker="o",linestyle='',markersize='6', capsize=4)
+
+		# place the ticks at center by widening the plot
+		ax3.set_xlim((0, 3))
+		# fix ticks at the number encoding for each class
+		ax3.set_xticks([1,2])
+		ax3.set_xticklabels(['hl60','hl60d'])
+		# name the numbers
+		
+		#ax3.set_ylabel(y_label,size=20)
+		ax3.set_xlabel('Cell',size=20)
 
 	
 	ax[0,0].set_title('HL 60', fontsize=20)
