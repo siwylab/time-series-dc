@@ -54,7 +54,8 @@ def cell_sequence(df,output_file='D://',save=False):
 
 	alpha=0.5
 	# Construct RGB version of grey-level image
-	color_mask = np.dstack((img_mask*0, img_mask*.3, img_mask*.5))
+	RGB = [0,.3,.5]
+	color_mask = np.dstack((img_mask*RGB[0], img_mask*RGB[1], img_mask*RGB[2]))
 	img_color = np.dstack((img, img, img))
 	# Convert the input image and color mask to Hue Saturation Value (HSV)
 	# colorspace
