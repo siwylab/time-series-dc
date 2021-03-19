@@ -324,14 +324,14 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 
 	#fig, ax = plt.subplots(nrows=len(yfeat), ncols=3,sharex='none',sharey='row',figsize=(20,30))
 
-	fig = plt.figure()
+	fig = plt.figure(figsize=(20,20))
 
 
 	for row in range(len(yfeat)):
 
-		ax1 = fig.add_subplot(len(yfeat),3,1*(1+row))
-		ax2 = fig.add_subplot(len(yfeat),3,2*(1+row) ,sharey = ax1)
-		ax3 = fig.add_subplot(len(yfeat),3,3*(1+row))
+		ax1 = fig.add_subplot(len(yfeat),3,(1+row*3))
+		ax2 = fig.add_subplot(len(yfeat),3,(2+row*3) ,sharey = ax1)
+		ax3 = fig.add_subplot(len(yfeat),3,(3+row*3))
 
 		x = df[df.cell=='hl60'][xfeat].to_numpy()
 		y = df[df.cell=='hl60'][yfeat[row]].to_numpy()
@@ -340,9 +340,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		xy = np.vstack([x,y])
 		z = gaussian_kde(xy)(xy)
 		ax1.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax1.set_xlabel(xlabel,fontsize=20)
-		ax1.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax1.set_xlabel('')
+		ax1.set_xlabel(xlabel)
 		
 		
 		ax1.set_ylabel(ylabel[row],fontsize=20)
@@ -359,9 +357,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		xy = np.vstack([x,y])
 		z = gaussian_kde(xy)(xy)
 		ax2.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax2.set_xlabel(xlabel,fontsize=20)
-		ax2.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax2.set_xlabel('')
+		ax2.set_xlabel(xlabel)
 		#ax2.set_ylabel(ylabel,fontsize=20)
 
 
@@ -375,7 +371,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 
 		x = ['HL 60','HL 60d']
 		y = [df[hlidx][yfeat[row]].mean(),df[hldidx][yfeat[row]].mean()]
-		e = [stats.sem(df[yfeat[row]][hlidx]),stats.sem(df[yfeat[row]][hldidx])]
+		e = [stats.sem(df[hlidx][yfeat[row]]),stats.sem(df[hldidx][yfeat[row]])]
      
 		ax3.errorbar([1,2], y, e, marker="o",linestyle='',markersize='6', capsize=4)
 
@@ -383,18 +379,18 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		ax3.set_xlim((0, 3))
 		# fix ticks at the number encoding for each class
 		ax3.set_xticks([1,2])
-		ax3.set_xticklabels(['hl60','hl60d'])
+		ax3.set_xticklabels(['hl60','hl60d'],fontsize=20)
 		# name the numbers
 		
 		#ax3.set_ylabel(y_label,size=20)
-		ax3.set_xlabel('Cell',size=20)
+		#ax3.set_xlabel('Cell',fontsize=20)
 
-	
-	ax[0,0].set_title('HL 60', fontsize=20)
-	ax1.set_xlabel(xlabel,fontsize=20)
+		if row==0:
+			ax1.set_title('HL 60', fontsize=20)
+			ax2.set_title('HL 60d', fontsize=20)
 
-	ax[0,1].set_title('HL 60d', fontsize=20)
-	ax2.set_xlabel(xlabel,fontsize=20)
+		ax2.set_xlabel(xlabel,fontsize=20)
+		ax1.set_xlabel(xlabel,fontsize=20)
 
 	if save:
 		plt.savefig(output_path)
