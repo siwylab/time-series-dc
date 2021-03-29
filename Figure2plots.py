@@ -23,6 +23,7 @@ from skimage.draw import rectangle
 import importlib
 import splitfolders
 from scipy.stats import gaussian_kde
+from matplotlib.ticker import MaxNLocator
 
 import plots
 import df_utils
@@ -55,6 +56,9 @@ def aspect_dvdx_x(df,output_path,event_num=193,save = False):
 
 	axs[0].set_ylabel('Aspect Ratio',size=20)
 
+	axs[0].xaxis.set_tick_params(labelsize=20)
+	axs[0].yaxis.set_tick_params(labelsize=20)
+
 
 	# trend = df.iloc[event_num].x_poly1
 	# trendpoly = np.poly1d(trend) 
@@ -75,6 +79,9 @@ def aspect_dvdx_x(df,output_path,event_num=193,save = False):
 
 	axs[1].set_ylabel('dv/dx (1/s)',size=20)
 
+	axs[1].xaxis.set_tick_params(labelsize=20)
+	axs[1].yaxis.set_tick_params(labelsize=20)
+
 
 	axs[0].axvspan(-20, 15, alpha=0.1, color='red')
 	axs[1].axvspan(-20, 15, alpha=0.1, color='red')
@@ -92,7 +99,45 @@ def aspect_dvdx_x(df,output_path,event_num=193,save = False):
 		plt.savefig(output_path)
 	else:
 		plt.show()
+def aspect_x(df,output_path,event_num=193,save = False):
 
+
+	plt.figure(figsize=(20,10))
+	#fig.suptitle('Vertically stacked subplots')
+
+	row = df[df.cell=='hl60d'].iloc[event_num]
+
+	plt.scatter(row.xcm_um,row.aspect,color='black',s=32)
+	plt.xlim([-20,170])
+	plt.ylim([0.8,1.6])
+
+	plt.ylabel('Aspect Ratio',size=20)
+	plt.xlabel('X position ($\mu$m)',size=20)
+
+	plt.xticks(fontsize=20)
+	plt.yticks(fontsize=20)
+
+
+	# trend = df.iloc[event_num].x_poly1
+	# trendpoly = np.poly1d(trend) 
+	# xs = df.iloc[event_num].xcm_um[df.iloc[event_num].nar1_max_arg-1:df.iloc[event_num].cav1_min_arg+1]
+	# axs[0].plot(xs,trendpoly(xs))
+
+
+	xposition = [0,150]
+
+	for xc in xposition:
+	    plt.axvline(x=xc, color='r', linestyle='--',lw=3)
+	    
+	plt.axvspan(-20, 15, alpha=0.1, color='red')
+	plt.axvspan(15, 75, alpha=0.1, color='green')
+	plt.axvspan(75, 125, alpha=0.1, color='yellow')
+	plt.axvspan(125, 170, alpha=0.1, color='blue')
+
+	if save:
+		plt.savefig(output_path)
+	else:
+		plt.show()
 def aspect_shear_x(df,output_path,event_num=193,save=False):
 
 
@@ -163,8 +208,9 @@ def feat_x(df,output_path,cell,y_label,feature='aspect',save=False):
 	plt.ylabel(y_label,size=axis_size)
 
 	plt.tick_params(labelsize=14)
-	plt.xlim((-20,170))
-	#plt.ylim((.75,2))
+	plt.xlim((-25,175))
+
+	plt.ylim((.6,2))
 	plt.tight_layout()
 
 	if save:
@@ -172,6 +218,68 @@ def feat_x(df,output_path,cell,y_label,feature='aspect',save=False):
 	else:
 		plt.show()
 
+def feat_x_sub(df,output_path,y_label,feature='aspect',trend=False,save=False):
+
+	fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=(30,10))
+
+	axis_size = 20
+	for i,row in df[df.cell=='hl60'].iterrows():
+		ax1.scatter(row.xcm_um,row[feature],color='black',alpha=0.3,s=16)
+	for i,row in df[df.cell=='hl60d'].iterrows():
+	    ax2.scatter(row.xcm_um,row[feature],color='black',alpha=0.3,s=16)
+	if trend == True:
+
+		trend1_hl60 = np.mean(pd.DataFrame(df[df.cell=='hl60'].x_poly1.to_list(), columns=['slope', 'yint']),axis=0)
+		trend2_hl60 = np.mean(pd.DataFrame(df[df.cell=='hl60'].x_poly2.to_list(), columns=['slope', 'yint']),axis=0)
+
+		trendpoly1_hl60 = np.poly1d(trend1_hl60) 
+		x = range(-50,200)
+		ax1.plot(x,trendpoly1_hl60(x),label='Region 1',linestyle='--',lw=3)
+
+		trendpoly2_hl60 = np.poly1d(trend2_hl60) 
+		x = range(-50,200)
+		ax1.plot(x,trendpoly2_hl60(x),label = 'Region 2',linestyle='--',lw=3)
+
+		trend1_hl60d = np.mean(pd.DataFrame(df[df.cell=='hl60d'].x_poly1.to_list(), columns=['slope', 'yint']),axis=0)
+		trend2_hl60d = np.mean(pd.DataFrame(df[df.cell=='hl60d'].x_poly2.to_list(), columns=['slope', 'yint']),axis=0)
+
+		trendpoly1_hl60d = np.poly1d(trend1_hl60d) 
+		x = range(-50,200)
+		ax2.plot(x,trendpoly1_hl60d(x),label = 'Region 1',linestyle='--',lw=3)
+
+		trendpoly2_hl60d = np.poly1d(trend2_hl60d) 
+		x = range(-50,200)
+		ax2.plot(x,trendpoly2_hl60d(x),label = 'Region 2',linestyle='--',lw=3)
+
+		ax1.legend()
+		ax2.legend()
+
+	xposition = [0,150]
+	for xc in xposition:
+	    ax1.axvline(x=xc, color='r', linestyle='--',lw=3)
+	    ax2.axvline(x=xc, color='r', linestyle='--',lw=3)
+	    
+	ax1.set_xlabel('x$_{c}$ ($\mu$m)',size=axis_size)
+	ax1.set_ylabel(y_label,size=axis_size)
+
+	ax2.set_xlabel('x$_{c}$ ($\mu$m)',size=axis_size)	
+
+	ax1.set_xlim((-25,175))
+	ax2.set_xlim((-25,175))
+
+	ax1.xaxis.set_tick_params(labelsize=20)
+	ax1.yaxis.set_tick_params(labelsize=20)
+
+	ax2.xaxis.set_tick_params(labelsize=20)
+	ax2.yaxis.set_tick_params(labelsize=20)
+	ax1.set_ylim((.6,2))
+
+	plt.tight_layout()
+
+	if save:
+		plt.savefig(output_path)
+	else:
+		plt.show()
 def pop_means_sem(df,y_label,feat,output_path='D://',save=False):
 	
 	hlidx = df.cell == 'hl60'
@@ -340,7 +448,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		xy = np.vstack([x,y])
 		z = gaussian_kde(xy)(xy)
 		ax1.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax1.set_xlabel(xlabel)
+		#ax1.set_xlabel(xlabel)
 		
 		
 		ax1.set_ylabel(ylabel[row],fontsize=20)
@@ -357,7 +465,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		xy = np.vstack([x,y])
 		z = gaussian_kde(xy)(xy)
 		ax2.scatter(x, y, c=z, s=100, edgecolor=None)
-		ax2.set_xlabel(xlabel)
+		#ax2.set_xlabel(xlabel)
 		#ax2.set_ylabel(ylabel,fontsize=20)
 
 
@@ -365,6 +473,16 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 			xytext=(-5, 5), textcoords='offset points',
             ha='right', va='bottom')
 
+		ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)
+		ax2.tick_params(axis = 'both', which = 'major', labelsize = 15)
+		ax3.tick_params(axis = 'y', which = 'major', labelsize = 15)
+
+		if (row == len(yfeat)-1)|(row == len(yfeat)-2):
+			ax1.ticklabel_format(axis='y', style='sci',scilimits=(0,0))
+			ax3.ticklabel_format(axis='y', style='sci',scilimits=(0,0))
+
+		ax1.yaxis.set_major_locator(plt.MaxNLocator(5))
+		ax3.yaxis.set_major_locator(plt.MaxNLocator(5))
 
 		hlidx = df.cell == 'hl60'
 		hldidx = df.cell == 'hl60d'
@@ -389,9 +507,11 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 			ax1.set_title('HL 60', fontsize=20)
 			ax2.set_title('HL 60d', fontsize=20)
 
-		ax2.set_xlabel(xlabel,fontsize=20)
-		ax1.set_xlabel(xlabel,fontsize=20)
-
+		if row == len(yfeat)-1:
+			ax2.set_xlabel(xlabel,fontsize=20)
+			ax1.set_xlabel(xlabel,fontsize=20)
+			ax1.set_ylim((-0.005,.025))
+	#plt.xticks(fontsize=20)
 	if save:
 		plt.savefig(output_path)
 	else:
