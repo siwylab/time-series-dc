@@ -15,9 +15,12 @@ cnn_lstm_auc = float(np.loadtxt('/home/dan/PycharmProjects/time-series-dc/CNN_LS
 plt.plot(lstm_fpr, lstm_tpr, label='LSTM' + ' (AUC: ' + str(round(lstm_auc, 2)) + ')')
 plt.plot(cnn_lstm_fpr, cnn_lstm_tpr, label='CNN-LSTM' + ' (AUC: ' + str(round(cnn_lstm_auc, 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
-plt.xlabel('False positive rate')
-plt.ylabel('True positive rate')
+plt.xlabel('False positive rate', fontsize=18)
+plt.ylabel('True positive rate', fontsize=16)
+
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 plt.title('ROC Curve')
 plt.legend(loc='best')
-plt.savefig('deep_learning_roc.png', dpi=300)
+plt.savefig('deep_learning_roc.eps', format='eps')
 
