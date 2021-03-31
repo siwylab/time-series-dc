@@ -48,14 +48,34 @@ def cell_sequence(df,output_file='D://',save=False):
 	    temp[i,:,:] = df_utils.raw_frame(file_path,row.tf[i])*row['mask'][i] - background*row['mask'][i]
 	    temp_mask[i,:,:] = row['mask'][i]
 	    
-	img_mask = np.sum(temp_mask,axis=0).astype(np.int)*0.5
+	img_mask = np.sum(temp_mask,axis=0).astype(np.int)
 	img = np.sum(temp,axis=0)+cv2.blur(background,(3,3))
+	img = (img - np.min(img)) / (np.max(img) - np.min(img))
+
+	alpha=0.5
+	# Construct RGB version of grey-level image
+	RGB = [0,.3,.5]
+	color_mask = np.dstack((img_mask*RGB[0], img_mask*RGB[1], img_mask*RGB[2]))
+	img_color = np.dstack((img, img, img))
+	# Convert the input image and color mask to Hue Saturation Value (HSV)
+	# colorspace
+	img_hsv = color.rgb2hsv(img_color)
+	color_mask_hsv = color.rgb2hsv(color_mask)
+
+	# Replace the hue and saturation of the original image
+	# with that of the color mask
+	img_hsv[..., 0] = color_mask_hsv[..., 0]
+	img_hsv[..., 1] = color_mask_hsv[..., 1] * alpha
+
+	img_masked = color.hsv2rgb(img_hsv)
 
 	plt.figure(figsize=(10,10))
-	plt.imshow(img,cmap='gray')
+	plt.imshow(img_masked,cmap='gray')
 	plt.axis('off')
 	plt.tight_layout()
+
 	if save:
 		plt.savefig(output_file)
 	else:
 		plt.show()
+
