@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 import os
 
 
-script_dir = os.path.dirname(__file__)
-
+ROOT_DIR = os.path.abspath("../../")
 # Load dataset
 df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
+sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
 
-feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
-                'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
+with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
+    feature_dict = pickle.load(file)
+feature_list = list(feature_dict)
 
 # Extract features
 x = df[feature_list].to_numpy()
@@ -49,5 +50,4 @@ plt.yticks(fontsize=14)
 plt.title('ROC Curve', fontsize=24)
 plt.legend(loc='best', prop={'size': 12})
 plt.tight_layout()
-# plt.show()
 plt.savefig('sklearn_roc.eps', format='eps')

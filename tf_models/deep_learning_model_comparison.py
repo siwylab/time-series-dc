@@ -1,15 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
+
+current_dir = os.getcwd()
 # Load LSTM fpr/tpr
-lstm_fpr = np.loadtxt('/home/dan/PycharmProjects/time-series-dc/lstm/lstm_fpr.csv')
-lstm_tpr = np.loadtxt('/home/dan/PycharmProjects/time-series-dc/lstm/lstm_tpr.csv')
-lstm_auc = float(np.loadtxt('/home/dan/PycharmProjects/time-series-dc/lstm/lstm_auc.csv'))
+lstm_fpr = np.loadtxt(os.path.join(current_dir, 'lstm', 'lstm_fpr.csv'))
+lstm_tpr = np.loadtxt(os.path.join(current_dir, 'lstm', 'lstm_tpr.csv'))
+lstm_auc = float(np.loadtxt(os.path.join(current_dir, 'lstm', 'lstm_auc.csv')))
+
 
 # Load CNN-LSTM fpr/tpr
-cnn_lstm_fpr = np.loadtxt('/home/dan/PycharmProjects/time-series-dc/CNN_LSTM/lstm_fpr.csv')
-cnn_lstm_tpr = np.loadtxt('/home/dan/PycharmProjects/time-series-dc/CNN_LSTM/lstm_tpr.csv')
-cnn_lstm_auc = float(np.loadtxt('/home/dan/PycharmProjects/time-series-dc/CNN_LSTM/lstm_auc.csv'))
+cnn_lstm_fpr = np.loadtxt(os.path.join(current_dir, 'CNN_LSTM', 'lstm_fpr.csv'))
+cnn_lstm_tpr = np.loadtxt(os.path.join(current_dir, 'CNN_LSTM', 'lstm_tpr.csv'))
+cnn_lstm_auc = float(np.loadtxt(os.path.join(current_dir, 'CNN_LSTM', 'lstm_auc.csv')))
+
 
 # Obtain fpr, tpr
 plt.plot(lstm_fpr, lstm_tpr, label='LSTM' + ' (AUC: ' + str(round(lstm_auc, 2)) + ')')
