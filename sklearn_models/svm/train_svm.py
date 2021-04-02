@@ -5,14 +5,18 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 
+# TODO: Update all plotting scripts
+ROOT_DIR = os.path.abspath("../../")
 # Load dataset
 df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
+sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
 
-feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
-                'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
-
+with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
+    feature_dict = pickle.load(file)
+feature_list = list(feature_dict)
 # Extract features
 x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
@@ -43,8 +47,7 @@ for c in c_list:
         svm_clf = svm.SVC(C=c, kernel=k, random_state=123, probability=True)
         svm_clf.fit(x_train, y_train.ravel())
         score[(str(c), k, 'N/A')] = svm_clf.score(x_val, y_val)
-for key in score:
-    print(key, score[key])
+
 # Select best weights
 c, k, d = max(score, key=lambda key: score[key])
 c = float(c)
@@ -57,7 +60,7 @@ svm_clf.fit(x_train, y_train.ravel())
 print(svm_clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test.ravel())
-plt.title('SVM' + ' C: ' + str(round(c,2)) + ' Kernel: ' + k + ' D: ' + str(d))
+plt.title('SVM' + ' C: ' + str(round(c, 2)) + ' Kernel: ' + k + ' D: ' + str(d))
 plt.savefig('svm_roc.png', dpi=300)
 
 pickle.dump(svm_clf, open('svm.pkl', 'wb'))

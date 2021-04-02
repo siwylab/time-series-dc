@@ -1,4 +1,3 @@
-import sys
 import pickle
 import sklearn
 from sklearn.neighbors import KNeighborsClassifier
@@ -6,13 +5,16 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-
+ROOT_DIR = os.path.abspath("../../")
 # Load dataset
 df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
+sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
 
-feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
-                'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
+with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
+    feature_dict = pickle.load(file)
+feature_list = list(feature_dict)
 
 # Extract features
 x = df[feature_list].to_numpy()

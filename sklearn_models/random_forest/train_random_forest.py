@@ -1,18 +1,20 @@
 import pickle
 import sklearn
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-
+ROOT_DIR = os.path.abspath("../../")
 # Load dataset
 df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
+sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
 
-feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
-                'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
-
+with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
+    feature_dict = pickle.load(file)
+feature_list = list(feature_dict)
 # Extract features
 x = df[feature_list].to_numpy()
 y = df[['y']].to_numpy()
@@ -29,24 +31,25 @@ x_val = scalar.transform(x_val)
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 score = {}
-# Grid search all hyperparameters
-c_list = np.linspace(0.1, 1.5, 10)
-for c in c_list:
-    clf = LogisticRegression(C=c, random_state=123)
+
+depth = np.arange(1, 30, 5)
+for d in depth:
+    clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
     clf.fit(x_train, y_train.ravel())
-    score[str(c)] = clf.score(x_val, y_val)
+    score[str(d)] = clf.score(x_val, y_val)
 
-# Select best weights
-c = max(score, key=lambda key: score[key])
+# Choose depth with best validation score
+d = max(score, key=lambda key: score[key])
+
+# Report accuracy using test set
 print('Optimized hyper params:')
-print('C: ', c)
-
-clf = LogisticRegression(C=float(c), random_state=123)
+print('Depth: ', d)
+clf = RandomForestClassifier(max_depth=int(d), criterion='gini', random_state=123)
 clf.fit(x_train, y_train.ravel())
 print(clf.score(x_test, y_test))
 
 sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
-plt.title('Logistic Regression' + ' C: ' + c)
-plt.savefig('logistic_regression_roc.png', dpi=300)
+plt.title('RF' + ' D: ' + str(d))
+plt.savefig('random_forest_roc.png', dpi=300)
 
-pickle.dump(clf, open('logistic_regression.pkl', 'wb'))
+pickle.dump(clf, open('random_forest.pkl', 'wb'))
