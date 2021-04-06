@@ -22,7 +22,7 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 def create_model():
     _model = tf.keras.models.Sequential()
     _model.add(layers.Masking(input_shape=x_train.shape[1:]))
-    _model.add(layers.GRU(55))
+    _model.add(layers.GRU(x_train.shape[1]))
     _model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
     _model.compile(optimizer='rmsprop',
@@ -55,7 +55,7 @@ plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.ylim([0.5, 1])
 plt.legend(loc='lower right')
-plt.savefig('gru_training.png', dpi=300)
+plt.savefig('gru_training.eps', format='eps')
 plt.figure()
 os.chdir(os.path.join(base_path, 'training_1'))
 

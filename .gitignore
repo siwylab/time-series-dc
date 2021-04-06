@@ -5,6 +5,7 @@ logs/
 results/
 temp/
 test/
+FINAL_DF
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
