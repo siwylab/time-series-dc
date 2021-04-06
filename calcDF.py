@@ -42,6 +42,7 @@ def calculate_df(event_path,oi_stage):
     circ_array = []
     deform_array = []
     r_um_array = []
+    xcm_pix_array, ycm_pix_array = [],[]
     xcm_um_array, ycm_um_array = [],[]
     tf_array = []
     event = []
@@ -63,6 +64,8 @@ def calculate_df(event_path,oi_stage):
     for j in df_raw.keys():
 
         num = len(df_raw[j]['mask'])
+        xcm_pix = np.empty(num)
+        ycm_pix = np.empty(num)
         xcm_um = np.empty(num)
         ycm_um = np.empty(num)
         area = np.empty(num)
@@ -100,6 +103,9 @@ def calculate_df(event_path,oi_stage):
 
             xc_um  = oi_stage.pixels_to_meters(xc_pix)
             yc_um  = oi_stage.pixels_to_meters(yc_pix)
+            
+            xcm_pix = np.mean(xc_pix)
+            ycm_pix = np.mean(yc_pix)
             xcm_um[i]  = np.mean(xc_um)
             ycm_um[i]  = np.mean(yc_um)
 

@@ -97,14 +97,24 @@ def calc_features(df):
 
 
   df['rad'] = df.apply(lambda a: np.nanmean(a.r_um[a.r_idx]),axis=1)
-  df['nar1_def'] = df.apply(lambda a: np.nanmax(a.deform_cx[a.nar1_idx]),axis=1)
-  df['nar2_def'] = df.apply(lambda a: np.nanmax(a.deform_cx[a.nar2_idx]),axis=1)
+  df['nar1_def'] = df.apply(lambda a: np.nanmean(a.deform_cx[a.nar1_idx]),axis=1)
+  df['nar2_def'] = df.apply(lambda a: np.nanmean(a.deform_cx[a.nar2_idx]),axis=1)
   df['cav1_def'] = df.apply(lambda a: np.nanmin(a.deform_cx[a.cav_idx]),axis=1)
+
 
   df['r_el'] = df.apply(lambda a: np.nanmean(a.r_um_el[a.r_idx]),axis=1)
   df['nar1_asp'] = df.apply(lambda a: np.nanmax(a.aspect[a.nar1_idx]),axis=1)
   df['nar2_asp'] = df.apply(lambda a: np.nanmax(a.aspect[a.nar2_idx]),axis=1)
   df['cav1_asp'] = df.apply(lambda a: np.nanmin(a.aspect[a.cav_idx]),axis=1)
+
+  df['nar1_per'] = df.apply(lambda a: np.nanmean(a.perimeter[a.nar1_idx]),axis=1)
+  df['nar2_per'] = df.apply(lambda a: np.nanmean(a.perimeter[a.nar2_idx]),axis=1)
+  df['cav1_per'] = df.apply(lambda a: np.nanmin(a.perimeter[a.cav_idx]),axis=1)
+
+  df['nar1_area'] = df.apply(lambda a: np.nanmean(a.area[a.nar1_idx]),axis=1)
+  df['nar2_area'] = df.apply(lambda a: np.nanmean(a.area[a.nar2_idx]),axis=1)
+  df['cav1_area'] = df.apply(lambda a: np.nanmin(a.area[a.cav_idx]),axis=1)
+
 
   df['nar1_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar1_asp)[0][0],axis=1)
   df['nar2_max_arg'] = df.apply(lambda a: np.where(a.aspect == a.nar2_asp)[0][0],axis=1)

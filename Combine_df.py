@@ -1,4 +1,4 @@
-c#!/usr/bin/env python
+#!/usr/bin/env python
 # coding: utf-8
 
 import pandas as pd
@@ -74,4 +74,4 @@ print('Calculating features')
 full_df = features.calc_features(full_df)
 
 print('Saving dataframe')
-full_df.to_pickle('D:/full_data101x56_2_xc_fixed_calcs')
+full_df.to_pickle('D:/FINAL_DF')

@@ -147,7 +147,7 @@ def raw_frame(file_path,tf,width = 880,height = 140):
     return frame
 
 
-def raw_bbox(row):
+def raw_bbox(row,back_sub = False,tf_back=0):
 
 	file_path = 'D:/' + row.date + '/' + row.cell + '/25_50_25x150/oi/' + row.run + '/bin/test_camera_0.raw'
 
@@ -157,6 +157,9 @@ def raw_bbox(row):
 	frame = raw_frame(file_path,tf)
 	mask = row['mask'][idx]
 
+	if back_sub:
+		temp_frame = raw_frame(file_path,tf_back)
+		frame = frame - temp_frame
 
 	ystart,xstart,yend,xend= extract_bboxes_uniform(mask)
 
