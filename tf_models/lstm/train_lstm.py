@@ -22,7 +22,7 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 def create_model():
     _model = tf.keras.models.Sequential()
     _model.add(layers.Masking(input_shape=x_train.shape[1:]))
-    _model.add(layers.LSTM(55))
+    _model.add(layers.LSTM(x_train.shape[1]))
     _model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
     _model.compile(optimizer='rmsprop',

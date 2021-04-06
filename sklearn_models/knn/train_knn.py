@@ -8,13 +8,15 @@ import matplotlib.pyplot as plt
 import os
 
 ROOT_DIR = os.path.abspath("../../")
-# Load dataset
-df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
+
 sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
 
 with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
     feature_dict = pickle.load(file)
 feature_list = list(feature_dict)
+
+# Load predetermined features from dataset
+df = pd.read_pickle('/home/dan/PycharmProjects/time-series-dc/final_df_florida_style.pkl')
 
 # Extract features
 x = df[feature_list].to_numpy()
