@@ -224,6 +224,10 @@ def save_mask_images(df,root_path = 'D://'):
 			plt.imsave(root_path+ '/' + c +'/' + str(c) + ' ' + str(i) + '.png',image,cmap='gray')
 			i = i+1
 
+def read_feats():
+	with open('./sklearn_models/feature_list.txt', 'r') as file:
+
+    	return json.load(file)
 """
 def save_cells_hdf5(df):
 
