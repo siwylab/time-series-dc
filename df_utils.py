@@ -226,8 +226,7 @@ def save_mask_images(df,root_path = 'D://'):
 
 def read_feats():
 	with open('./sklearn_models/feature_list.txt', 'r') as file:
-
-    	return json.load(file)
+		return json.load(file)
 """
 def save_cells_hdf5(df):
 
