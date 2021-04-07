@@ -23,6 +23,8 @@ from scipy import stats
 # Program specific
 PORE_STATS_BASE_DIRECTORY = 'C://Users//codyt//Documents//repos//pore_stats//pore_stats//oi_3'
 sys.path.append(PORE_STATS_BASE_DIRECTORY)
+DAN_BASE_DIRECTORY = '/home/dan/Documents/siwylab/updated_code/oi_image_processing_py3'
+sys.path.append(DAN_BASE_DIRECTORY)
 import optical_imaging as oi
 import oi_file
 import image_processing 
@@ -225,7 +227,9 @@ def save_mask_images(df,root_path = 'D://'):
 			i = i+1
 
 def read_feats():
-	with open('./sklearn_models/feature_list.txt', 'r') as file:
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	feature_list_dir = os.path.join(dir_path, 'sklearn_models/feature_list.txt')
+	with open(feature_list_dir, 'r') as file:
 		return json.load(file)
 """
 def save_cells_hdf5(df):
