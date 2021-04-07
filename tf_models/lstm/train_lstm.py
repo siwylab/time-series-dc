@@ -6,10 +6,18 @@ from tensorflow.keras import layers
 import numpy as np
 import os
 import sklearn
+import sys
+import pandas as pd
+
+# Import df_utils
+ROOT_DIR = os.path.abspath("../../")
+sys.path.append(ROOT_DIR)
+import df_utils
 
 # Load dataset
-x = np.load('/home/dan/Documents/siwylab/AWS/sequential_x.npy')
-y = np.load('/home/dan/Documents/siwylab/AWS/sequential_y.npy')
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+
+x, y = df_utils.extract_sequential_features(df)
 
 # Split test and train data
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)

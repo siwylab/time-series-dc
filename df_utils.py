@@ -222,6 +222,56 @@ def read_feats():
         return json.load(file)
 
 
+def pad_columns(columns, df):
+    max_length = 35
+    data_outer = 0
+    for i, column in enumerate(columns):
+        for ii, data in enumerate(df[column]):
+            # Skip erroneously long rows
+            if df.iloc[i]['seq_len'] > max_length:
+                continue
+            start = df.iloc[i]['x_start']
+            end = df.iloc[i]['x_end']
+            cleaned = np.nan_to_num(data, nan=1.0)[start:end]
+
+            # Prepend data with start token
+            padded = np.pad(np.array(cleaned), (0, max_length-len(cleaned)))
+            if not ii:
+                data_array = padded
+            else:
+                data_array = np.vstack((data_array, padded))
+        # Subtract mean and divide by variance
+        data_mean = np.mean(data_array)
+        data_std = np.std(data_array)
+        data_array = (data_array-data_mean)/data_std
+        if not i:
+            data_outer = np.expand_dims(data_array, axis=2)
+        else:
+            data_outer = np.concatenate((data_outer, np.expand_dims(data_array, axis=2)), axis=2)
+    return data_outer
+
+
+def extract_sequential_features(df, feature_list=None):
+    if feature_list is None:
+        feature_list = ['aspect', 'perimater', 'area']
+
+    # Filter df
+    df = pd.read_pickle('/home/dan/PycharmProjects/time-series-dc/FINAL_DF_light')
+    df = filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
+    df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
+    df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
+    df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
+    df.dropna(inplace=True)
+
+    df['seq_len'] = df.apply(lambda a: len(a['aspect']), axis=1)
+    df['x_start'] = df.apply(lambda a: np.argmin(np.abs(a['xcm_um'] - 30)), axis=1)
+    df['x_end'] = df.apply(lambda a: np.argmin(np.abs(170 - a['xcm_um'])), axis=1)
+    lstm_x = pad_columns(feature_list, df)
+    lstm_y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+    assert not np.any(np.argwhere(np.isnan(lstm_x)))
+    assert not np.any(np.argwhere(np.isnan(lstm_y)))
+    return lstm_x, lstm_y
+
 """
 def save_cells_hdf5(df):
 
