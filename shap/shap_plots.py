@@ -1,23 +1,32 @@
 from sklearn.model_selection import train_test_split
-import shutil
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import shap
 import numpy as np
 import os
 import sklearn
 import pickle
 import pandas as pd
+import sys
+
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)
+import df_utils
+
+feature_dict = df_utils.read_feats()
+feature_list = list(feature_dict)
+feature_list_cleaned = [feature_dict[i] for i in list(feature_dict.keys())]
 
 # Load dataset
-df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
-
-feature_list = ['peak_to_peak', 'mean_aspect', 'lfitr0p0', 'lfitr0p1', 'lfitr1p0', 'lfitr1p1', 'nar1_asp', 'nar2_asp',
-                'cav1_asp', 'cav2_asp', 'mean_area', 'mean_perimeter']
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+df = df_utils.filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
+df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
+df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
+df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
+df.dropna(inplace=True)
 
 # Extract features
 x = df[feature_list].to_numpy()
-y = df[['y']].to_numpy()
+y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
@@ -31,10 +40,10 @@ x_val = scalar.transform(x_val)
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 # Load trained random forest model
-os.chdir('..')
+os.chdir('../')
 current_dir = os.getcwd()
 rel_dir = 'random_forest'
-model_dir = os.path.join(current_dir, rel_dir, rel_dir+'.pkl')
+model_dir = os.path.join(ROOT_DIR, 'sklearn_models', rel_dir, rel_dir+'.pkl')
 with open(model_dir, 'rb') as pkl_file:
     model = pickle.load(pkl_file)
 
@@ -43,18 +52,7 @@ explainer = shap.TreeExplainer(model)
 
 # Calculate shap_values for all of val_X rather than a single row, to have more data for plot.
 shap_values = explainer.shap_values(x_test)
-feature_list_cleaned = ['peak to peak',
-                        'mean aspect',
-                        'linear fit r0 slope',
-                        'linear fit r0 y-int',
-                        'linear fit r1 slope',
-                        'linear fit r1 y-int',
-                        'narrow 1 mean aspect',
-                        'narrow 2 mean aspect',
-                        'cavity 1 mean aspect',
-                        'cavity 2 mean aspect',
-                        'mean area',
-                        'mean perimeter']
+
 
 # Make plot
 os.chdir('shap/')
