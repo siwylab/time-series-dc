@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import sys
+from matplotlib import rcParams
+
+rcParams['font.family'] = 'arial'
 
 ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)

@@ -7,6 +7,9 @@ import sklearn
 import pickle
 import pandas as pd
 import sys
+from matplotlib import rcParams
+
+rcParams['font.family'] = 'arial'
 
 ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)

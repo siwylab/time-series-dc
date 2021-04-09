@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from matplotlib import rcParams
 
+rcParams['font.family'] = 'arial'
 
 current_dir = os.getcwd()
 # Load LSTM fpr/tpr
@@ -28,4 +30,4 @@ plt.yticks(fontsize=14)
 plt.title('ROC Curve')
 plt.legend(loc='best')
 plt.savefig('deep_learning_roc.eps', format='eps')
-
+plt.show()

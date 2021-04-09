@@ -225,22 +225,32 @@ def read_feats():
 def pad_columns(columns, df):
     max_length = 35
     data_outer = 0
+    data_array = None
+    skipped = 0
     for i, column in enumerate(columns):
         for ii, data in enumerate(df[column]):
             # Skip erroneously long rows
-            if df.iloc[i]['seq_len'] > max_length:
+            if df.iloc[ii]['seq_len'] > max_length:
+                skipped += 1
                 continue
-            start = df.iloc[i]['x_start']
-            end = df.iloc[i]['x_end']
+            start = df.iloc[ii]['x_start']
+            end = df.iloc[ii]['x_end']
             cleaned = np.nan_to_num(data, nan=1.0)[start:end]
-
             # Prepend data with start token
             padded = np.pad(np.array(cleaned), (0, max_length-len(cleaned)))
-            if not ii:
+
+            # For first pass, data_array doesn't exist, so just assign padded to data_array
+            # In the case where we skip the first row... TODO
+            if not ii or data_array is None:
                 data_array = padded
+                print(data_array.shape, '\t', 'i: ', i, '\t', 'ii: ', ii)
             else:
                 data_array = np.vstack((data_array, padded))
+                print(data_array.shape, '\t', 'i: ', i, '\t', 'ii: ', ii)
         # Subtract mean and divide by variance
+        if data_array is None:
+            print('skipped: ', skipped)
+            continue
         data_mean = np.mean(data_array)
         data_std = np.std(data_array)
         data_array = (data_array-data_mean)/data_std
@@ -253,10 +263,9 @@ def pad_columns(columns, df):
 
 def extract_sequential_features(df, feature_list=None):
     if feature_list is None:
-        feature_list = ['aspect', 'perimater', 'area']
+        feature_list = ['aspect', 'perimeter', 'area']
 
     # Filter df
-    df = pd.read_pickle('/home/dan/PycharmProjects/time-series-dc/FINAL_DF_light')
     df = filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
     df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
     df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
@@ -268,6 +277,7 @@ def extract_sequential_features(df, feature_list=None):
     df['x_end'] = df.apply(lambda a: np.argmin(np.abs(170 - a['xcm_um'])), axis=1)
     lstm_x = pad_columns(feature_list, df)
     lstm_y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+    print(lstm_x)
     assert not np.any(np.argwhere(np.isnan(lstm_x)))
     assert not np.any(np.argwhere(np.isnan(lstm_y)))
     return lstm_x, lstm_y

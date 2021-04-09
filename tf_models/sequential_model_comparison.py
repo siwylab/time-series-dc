@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from matplotlib import rcParams
 
+rcParams['font.family'] = 'arial'
 
 current_dir = os.getcwd()
 # Load LSTM fpr/tpr
