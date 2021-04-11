@@ -47,10 +47,12 @@ for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
         model = pickle.load(pkl_file)
 
     # Obtain fpr, tpr
-    fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, model.predict_proba(x_test)[:, 1])
-    auc = sklearn.metrics.roc_auc_score(y_test, model.predict_proba(x_test)[:, 1])
+    y_pred = model.predict_proba(x_test)[:, 1].round().astype(np.int64)
+    fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+    auc = sklearn.metrics.roc_auc_score(y_test, y_pred)
     plt.plot(fpr, tpr, label=rel_dir + ' (AUC: ' + str(round(auc, 2)) + ')')
-
+    model_dict[rel_dir] = sklearn.metrics.accuracy_score(y_test, y_pred)*100
+    print(sklearn.metrics.accuracy_score(y_test, y_pred))
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate', fontsize=18)
 plt.ylabel('True positive rate', fontsize=16)
@@ -62,4 +64,16 @@ plt.title('ROC Curve', fontsize=24)
 plt.legend(loc='best', prop={'size': 12})
 plt.tight_layout()
 plt.savefig('sklearn_roc.eps', format='eps')
+plt.close()
+
+print(model_dict.keys())
+plt.bar(range(len(model_dict.keys())), [model_dict[i] for i in list(model_dict.keys())], tick_label=list(model_dict.keys()))
+plt.ylabel('Accuracy (Percent)', fontsize=16)
+
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+
+plt.title('Traditional Machine Learning Model Performance', fontsize=24)
+plt.tight_layout()
+plt.savefig('sklearn_bar.eps', format='eps')
 plt.show()
