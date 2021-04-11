@@ -223,11 +223,11 @@ def read_feats():
 
 
 def pad_columns(columns, df):
-    max_length = 35
+    max_length = 55
     data_outer = 0
-    data_array = None
     skipped = 0
     for i, column in enumerate(columns):
+        data_array = None
         for ii, data in enumerate(df[column]):
             # Skip erroneously long rows
             if df.iloc[ii]['seq_len'] > max_length:
@@ -243,13 +243,10 @@ def pad_columns(columns, df):
             # In the case where we skip the first row... TODO
             if not ii or data_array is None:
                 data_array = padded
-                print(data_array.shape, '\t', 'i: ', i, '\t', 'ii: ', ii)
             else:
                 data_array = np.vstack((data_array, padded))
-                print(data_array.shape, '\t', 'i: ', i, '\t', 'ii: ', ii)
         # Subtract mean and divide by variance
         if data_array is None:
-            print('skipped: ', skipped)
             continue
         data_mean = np.mean(data_array)
         data_std = np.std(data_array)
@@ -277,7 +274,7 @@ def extract_sequential_features(df, feature_list=None):
     df['x_end'] = df.apply(lambda a: np.argmin(np.abs(170 - a['xcm_um'])), axis=1)
     lstm_x = pad_columns(feature_list, df)
     lstm_y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
-    print(lstm_x)
+    # print(lstm_x)
     assert not np.any(np.argwhere(np.isnan(lstm_x)))
     assert not np.any(np.argwhere(np.isnan(lstm_y)))
     return lstm_x, lstm_y
