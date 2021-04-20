@@ -11,6 +11,7 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'arial'
 
 ROOT_DIR = os.path.abspath("../")
+current_dir = os.getcwd()
 sys.path.append(ROOT_DIR)
 import df_utils
 
@@ -39,8 +40,8 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 # Iterate over models and plot roc
 model_dict = {}
 ax = plt.subplot(222)
+
 for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
-    current_dir = os.getcwd()
     model_dir = os.path.join(current_dir, rel_dir, rel_dir+'.pkl')
     # Load model
     with open(model_dir, 'rb') as pkl_file:
@@ -49,6 +50,11 @@ for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
     # Obtain fpr, tpr
     y_pred = model.predict_proba(x_test)[:, 1].round().astype(np.int64)
     fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+    if rel_dir == 'svm':
+        os.chdir(os.path.join(current_dir, rel_dir))
+        np.save('svm_pred', y_pred)
+        np.save('svm_ground_truth', y_test)
+        os.chdir(current_dir)
     auc = sklearn.metrics.roc_auc_score(y_test, y_pred)
     plt.plot(fpr, tpr, label=rel_dir + ' (AUC: ' + str(round(auc, 2)) + ')')
     model_dict[rel_dir] = sklearn.metrics.accuracy_score(y_test, y_pred)*100
@@ -65,15 +71,16 @@ plt.legend(loc='best', prop={'size': 12})
 plt.tight_layout()
 plt.savefig('sklearn_roc.eps', format='eps')
 plt.close()
+fig = plt.figure(figsize=(5, 2.5))
 
-print(model_dict.keys())
 plt.bar(range(len(model_dict.keys())), [model_dict[i] for i in list(model_dict.keys())], tick_label=list(model_dict.keys()))
-plt.ylabel('Accuracy (Percent)', fontsize=16)
+plt.ylabel('Accuracy (Percent)', fontsize=9)
 
-plt.xticks(fontsize=14)
-plt.yticks(fontsize=14)
+plt.xticks(fontsize=8)
+plt.yticks(fontsize=8)
 
-plt.title('Traditional Machine Learning Model Performance', fontsize=24)
+plt.title('Traditional Machine Learning Model Performance', fontsize=10)
 plt.tight_layout()
 plt.savefig('sklearn_bar.eps', format='eps')
+plt.savefig('sklearn_bar.png', format='png')
 plt.show()
