@@ -7,6 +7,9 @@ import os
 import numpy as np
 import sys
 from matplotlib import rcParams
+from matplotlib.pyplot import figure
+
+
 
 rcParams['font.family'] = 'arial'
 
@@ -39,8 +42,8 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 
 # Iterate over models and plot roc
 model_dict = {}
-ax = plt.subplot(222)
 
+# figure(figsize=(5, 2.5), dpi=300)
 for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
     model_dir = os.path.join(current_dir, rel_dir, rel_dir+'.pkl')
     # Load model
@@ -48,17 +51,22 @@ for rel_dir in ['knn', 'logistic_regression', 'random_forest', 'svm']:
         model = pickle.load(pkl_file)
 
     # Obtain fpr, tpr
-    y_pred = model.predict_proba(x_test)[:, 1].round().astype(np.int64)
+    y_pred = model.predict_proba(x_test)[:, 1]
     fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+    auc = sklearn.metrics.roc_auc_score(y_test, y_pred)
+    plt.plot(fpr, tpr, label=rel_dir + ' (AUC: ' + str(round(auc, 2)) + ')')
+    model_dict[rel_dir] = sklearn.metrics.accuracy_score(y_test, y_pred.round())*100
+    print(sklearn.metrics.accuracy_score(y_test, y_pred.round()))
+    # Save SVM performance for deep learning comparison plot
     if rel_dir == 'svm':
         os.chdir(os.path.join(current_dir, rel_dir))
         np.save('svm_pred', y_pred)
         np.save('svm_ground_truth', y_test)
+        np.savetxt('svm_fpr.csv', fpr)
+        np.savetxt('svm_tpr.csv', tpr)
+        np.savetxt('svm_auc.csv', np.ones(1)*auc)
         os.chdir(current_dir)
-    auc = sklearn.metrics.roc_auc_score(y_test, y_pred)
-    plt.plot(fpr, tpr, label=rel_dir + ' (AUC: ' + str(round(auc, 2)) + ')')
-    model_dict[rel_dir] = sklearn.metrics.accuracy_score(y_test, y_pred)*100
-    print(sklearn.metrics.accuracy_score(y_test, y_pred))
+
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate', fontsize=18)
 plt.ylabel('True positive rate', fontsize=16)
@@ -69,7 +77,10 @@ plt.yticks(fontsize=14)
 plt.title('ROC Curve', fontsize=24)
 plt.legend(loc='best', prop={'size': 12})
 plt.tight_layout()
+
+plt.show()
 plt.savefig('sklearn_roc.eps', format='eps')
+
 plt.close()
 fig = plt.figure(figsize=(5, 2.5))
 

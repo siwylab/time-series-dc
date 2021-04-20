@@ -28,6 +28,9 @@ cnn_gru_accuracy = sklearn.metrics.accuracy_score(cnn_gru_pred_true[1], cnn_gru_
 svm_pred = np.load(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_pred.npy'))
 svm_y_true = np.load(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_ground_truth.npy'))
 svm_accuracy = sklearn.metrics.accuracy_score(svm_y_true, svm_pred.round())
+svm_fpr = np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_fpr.csv'))
+svm_tpr = np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_tpr.csv'))
+svm_auc = float(np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_auc.csv')))
 
 # cnn_gru_folds = [0.9401993155,
 #                   0.9399999976,
@@ -36,8 +39,9 @@ svm_accuracy = sklearn.metrics.accuracy_score(svm_y_true, svm_pred.round())
 #                   0.9399999976]
 
 # Obtain fpr, tpr
-plt.plot(gru_fpr, gru_tpr, label='gru' + ' (AUC: ' + str(round(gru_auc, 2)) + ')')
-plt.plot(cnn_gru_fpr, cnn_gru_tpr, label='CNN-gru' + ' (AUC: ' + str(round(cnn_gru_auc, 2)) + ')')
+plt.plot(svm_fpr, svm_tpr, label='SVM' + ' (AUC: ' + str(round(svm_auc, 2)) + ')')
+plt.plot(gru_fpr, gru_tpr, label='GRU' + ' (AUC: ' + str(round(gru_auc, 2)) + ')')
+plt.plot(cnn_gru_fpr, cnn_gru_tpr, label='CNN-GRU' + ' (AUC: ' + str(round(cnn_gru_auc, 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate', fontsize=18)
 plt.ylabel('True positive rate', fontsize=16)
