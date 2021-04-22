@@ -141,6 +141,8 @@ def raw_frame(file_path, tf, width=880, height=140):
 
 def raw_bbox(row,back_sub = False,tf_back=0,cav=True,idx=0):
 
+	file_path = 'D:/' + row.date + '/' + row.cell + '/25_50_25x150/oi/' + row.run + '/bin/test_camera_0.raw'
+	
 	if cav:
 		idx = row.cav1_min_arg
 		
