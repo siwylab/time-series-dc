@@ -6,18 +6,26 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import sys
 
 ROOT_DIR = os.path.abspath("../../")
-# Load dataset
-df = pd.read_pickle('/home/dan/Documents/siwylab/AWS/df_with_features.pkl')
-sklearn_dir = os.path.join(ROOT_DIR, 'sklearn_models')
+sys.path.append(ROOT_DIR)
+import df_utils
 
-with open(os.path.join(sklearn_dir, 'feature_list.pkl'), 'rb') as file:
-    feature_dict = pickle.load(file)
+feature_dict = df_utils.read_feats()
 feature_list = list(feature_dict)
+
+# Load dataset
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+df = df_utils.filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
+df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
+df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
+df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
+df.dropna(inplace=True)
+
 # Extract features
 x = df[feature_list].to_numpy()
-y = df[['y']].to_numpy()
+y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()

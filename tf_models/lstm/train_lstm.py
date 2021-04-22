@@ -6,10 +6,18 @@ from tensorflow.keras import layers
 import numpy as np
 import os
 import sklearn
+import sys
+import pandas as pd
+
+# Import df_utils
+ROOT_DIR = os.path.abspath("../../")
+sys.path.append(ROOT_DIR)
+import df_utils
 
 # Load dataset
-x = np.load('/home/dan/Documents/siwylab/AWS/sequential_x.npy')
-y = np.load('/home/dan/Documents/siwylab/AWS/sequential_y.npy')
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+
+x, y = df_utils.extract_sequential_features(df)
 
 # Split test and train data
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
@@ -17,12 +25,15 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 
 # Use function for making specific models, allows model architectures to be recreated with random parameters for
 # testing purposes
+# Notes: 1 LSTM layer gives 81% training accuracy (no dropout)
+# Need to try: 2 LSTM with and without dropout
 
 
 def create_model():
     _model = tf.keras.models.Sequential()
     _model.add(layers.Masking(input_shape=x_train.shape[1:]))
-    _model.add(layers.LSTM(x_train.shape[1]))
+    _model.add(layers.LSTM(x_train.shape[1], return_sequences=True, dropout=0.1))
+    _model.add(layers.LSTM(x_train.shape[1], dropout=0.1))
     _model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
     _model.compile(optimizer='rmsprop',
@@ -76,6 +87,9 @@ np.savetxt('lstm_fpr.csv', fpr)
 np.savetxt('lstm_tpr.csv', tpr)
 np.savetxt('lstm_auc.csv', auc)
 
+# Save npy of y_pred/y_true
+np.save('lstm_pred', np.vstack((pred, y_test)))
+
 plt.plot(fpr, tpr, label='LSTM' + ' (AUC: ' + str(round(float(auc), 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
 plt.xlabel('False positive rate')
@@ -83,3 +97,6 @@ plt.ylabel('True positive rate')
 plt.title('ROC Curve')
 plt.legend(loc='best')
 plt.savefig('lstm_roc.png', dpi=300)
+
+os.chdir(os.path.join(ROOT_DIR, 'tf_models'))
+np.save('seq_y_true', y_test)

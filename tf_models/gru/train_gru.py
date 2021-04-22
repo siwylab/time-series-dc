@@ -6,10 +6,17 @@ from tensorflow.keras import layers
 import numpy as np
 import os
 import sklearn
+import pandas as pd
+import sys
+# Import df_utils
+ROOT_DIR = os.path.abspath("../../")
+sys.path.append(ROOT_DIR)
+import df_utils
 
 # Load dataset
-x = np.load('/home/dan/Documents/siwylab/AWS/sequential_x.npy')
-y = np.load('/home/dan/Documents/siwylab/AWS/sequential_y.npy')
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+
+x, y = df_utils.extract_sequential_features(df)
 
 # Split test and train data
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
@@ -22,6 +29,7 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 def create_model():
     _model = tf.keras.models.Sequential()
     _model.add(layers.Masking(input_shape=x_train.shape[1:]))
+    _model.add(layers.GRU(x_train.shape[1], return_sequences=True))
     _model.add(layers.GRU(x_train.shape[1]))
     _model.add(layers.Dense(24, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
@@ -75,6 +83,9 @@ auc = np.expand_dims(sklearn.metrics.auc(fpr, tpr), -1)
 np.savetxt('gru_fpr.csv', fpr)
 np.savetxt('gru_tpr.csv', tpr)
 np.savetxt('gru_auc.csv', auc)
+
+# Save npy of y_pred/y_true
+np.save('gru_pred.npy', np.vstack((pred, y_test)))
 
 plt.plot(fpr, tpr, label='GRU' + ' (AUC: ' + str(round(float(auc), 2)) + ')')
 plt.plot([0, 1], [0, 1], 'k--')
