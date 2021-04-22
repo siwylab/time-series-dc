@@ -27,12 +27,14 @@ from matplotlib.ticker import MaxNLocator
 from plot_tools import set_size
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import ScalarFormatter
+from skimage.transform import resize
+
 
 import plots
 import df_utils
 import features
 
-
+plt.rcParams["font.family"] = "Arial"
 
 def aspect_dvdx_x(df,output_path,event_num=193,save = False):
 
@@ -262,10 +264,10 @@ def feat_x_sub(df,output_path,y_label,feature='aspect',trend=False,save=False):
 	    ax1.axvline(x=xc, color='r', linestyle='--',lw=2)
 	    ax2.axvline(x=xc, color='r', linestyle='--',lw=2)
 	    
-	ax1.set_xlabel('x$_{c}$ ($\mu$m)',size=axis_size)
+	ax1.set_xlabel('X postion ($\mu$m)',size=axis_size)
 	ax1.set_ylabel(y_label,size=axis_size)
 
-	ax2.set_xlabel('x$_{c}$ ($\mu$m)',size=axis_size)	
+	ax2.set_xlabel('X postion ($\mu$m)',size=axis_size)	
 
 	ax1.set_xlim((-25,175))
 	ax2.set_xlim((-25,175))
@@ -275,15 +277,161 @@ def feat_x_sub(df,output_path,y_label,feature='aspect',trend=False,save=False):
 
 	ax2.xaxis.set_tick_params(labelsize=12)
 	ax2.yaxis.set_tick_params(labelsize=12)
-	ax1.set_ylim((.6,2))
-	ax1.set_title('HL 60', fontsize=12)
-	ax2.set_title('HL 60d', fontsize=12)
+	ax1.set_ylim((.8,1.8))
+	ax1.set_title('HL60', fontsize=12)
+	ax2.set_title('HL60d', fontsize=12)
+
+	ax1.text(-0.15, 1.15, 'a)', transform=ax1.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+	ax2.text(-0.05, 1.15, 'b)', transform=ax2.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+
+	"""
+	img1 = plt.imread('./figures/figure2/ellipse.png')
+	img2 = plt.imread('./figures/figure2/sphere.png')
+
+	
+	img1 = resize(img1, (47, 50))
+	img2 = resize(img2, (47, 50))
+	# [left, bottom, width, height]
+	image_axis = fig.add_axes([0.1, 0.1, 0.04, 0.85], zorder=10, anchor="N")
+	image_axis.imshow(img1)
+	image_axis.axis('off')
+
+	image_axis = fig.add_axes([0.1,-.425, 0.04, 0.85], zorder=10, anchor="N")
+	image_axis.imshow(img2)
+	image_axis.axis('off')
+	"""
 	plt.tight_layout()
 
 	if save:
 		plt.savefig(output_path,dpi=600)
 	else:
 		plt.show()
+
+def feat_x_sub_fit(df,output_path,y_label,feature='aspect',trend=False,save=False):
+
+	#fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=set_size(469.7,fraction=1,hratio=1.4,subplots=(1,2)))
+	fig = plt.figure(figsize=set_size(469.7,fraction=1,hratio=2,subplots=(1,2)))
+	ax1 = plt.subplot2grid((2, 2), (0, 0), colspan=1)
+	ax2 = plt.subplot2grid((2, 2), (0, 1), colspan=1,sharey=ax1)
+	ax3 = plt.subplot2grid((2, 2), (1, 0), colspan=2)
+	axis_size = 12
+
+	for i,row in df[df.cell=='hl60'].iterrows():
+		ax1.scatter(row.xcm_um,row[feature],color='black',alpha=0.15,s=1)
+	for i,row in df[df.cell=='hl60d'].iterrows():
+	    ax2.scatter(row.xcm_um,row[feature],color='black',alpha=0.15,s=1)
+	
+	row = df[df.idx==1445].iloc[0]
+
+	ax3.scatter(row.xcm_um,row.aspect,color='black',s=32)
+	ax3.set_xlim([-20,170])
+	ax3.set_ylim([0.9,1.7])
+
+	ax3.set_ylabel('Aspect Ratio',size=12)
+
+	ax3.xaxis.set_tick_params(labelsize=12)
+	ax3.yaxis.set_tick_params(labelsize=12)
+
+
+
+
+	x = range(-20,170)
+	m1 = row.r1_slope
+	b1 = row.r1_int
+	poly1 = np.poly1d([m1,b1])
+
+	m2 = row.r2_slope
+	b2 = row.r2_int
+	poly2 = np.poly1d([m2,b2])
+
+	ax3.plot(x,poly1(x),label = 'R2 Slope',linestyle='--')
+	ax3.plot(x,poly2(x),label = 'R3 Slope',linestyle='--')
+
+	x1 = row.xcm_um[np.argmax(row.aspect)]
+	y1 = 1.0
+	x2 = x1
+	y2 = row.nar1_asp
+	ax3.plot((x1,x2),(y1,y2),'k-')
+	linewidth = 2
+	ax3.plot((x1-linewidth,x2+linewidth),(y1,y1),'k-')
+	ax3.plot((x1-linewidth,x2+linewidth),(y2,y2),'k-')
+
+	ax3.legend(loc='upper right')
+	#ax3.text(x1, (row.nar1_asp+1)/2, 'Begin text', horizontalalignment='center', verticalalignment='center', transform=ax3.transAxes)
+	ax3.text(x1+2, (row.nar1_asp+1)/2, 'AR1', horizontalalignment='left', 
+		verticalalignment='center',fontsize=12,family='Arial')
+
+	x1 = row.xcm_um[np.where(row.aspect==row.nar2_asp)][0]
+	y1 = 1.0
+	x2 = x1
+	y2 = row.nar2_asp
+	ax3.plot((x1,x2),(y1,y2),'k-')
+	linewidth = 2
+	ax3.plot((x1-linewidth,x2+linewidth),(y1,y1),'k-')
+	ax3.plot((x1-linewidth,x2+linewidth),(y2,y2),'k-')
+
+	ax3.text(x1+2, (row.nar2_asp+1)/2, 'AR2', horizontalalignment='left', 
+		verticalalignment='center',fontsize=12,family='Arial')
+	ax3.set_xlabel('X postion ($\mu$m)',size=12)
+	xposition = [0,150]
+	for xc in xposition:
+		ax1.axvline(x=xc, color='r', linestyle='--',lw=2)
+		ax2.axvline(x=xc, color='r', linestyle='--',lw=2)
+		ax3.axvline(x=xc, color='r', linestyle='--',lw=2)
+
+	ax1.set_xlabel('X postion ($\mu$m)',size=axis_size)
+	ax1.set_ylabel(y_label,size=axis_size)
+
+	ax2.set_xlabel('X postion ($\mu$m)',size=axis_size)	
+
+	ax1.set_xlim((-25,175))
+	ax2.set_xlim((-25,175))
+
+	ax1.xaxis.set_tick_params(labelsize=12)
+	ax1.yaxis.set_tick_params(labelsize=12)
+
+	ax2.xaxis.set_tick_params(labelsize=12)
+	ax2.yaxis.set_tick_params(labelsize=12)
+	ax1.set_ylim((.8,1.8))
+	ax1.set_title('HL60', fontsize=12)
+	ax2.set_title('HL60d', fontsize=12)
+
+	ax1.text(-0.05, 1.15, 'a)', transform=ax1.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+	ax2.text(-0.05, 1.15, 'b)', transform=ax2.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+	ax3.text(-0.05, 1.15, 'c)', transform=ax3.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+	
+	ax3.scatter(row.xcm_um,row.aspect,color='black',s=32)
+	ax3.set_xlim([-20,170])
+	ax3.set_ylim([0.9,1.7])
+
+	ax3.set_ylabel('Aspect Ratio',size=12)
+
+	ax3.xaxis.set_tick_params(labelsize=12)
+	ax3.yaxis.set_tick_params(labelsize=12)
+	"""
+	img1 = plt.imread('./figures/figure2/ellipse.png')
+	img2 = plt.imread('./figures/figure2/sphere.png')
+
+	
+	img1 = resize(img1, (47, 50))
+	img2 = resize(img2, (47, 50))
+	# [left, bottom, width, height]
+	image_axis = fig.add_axes([0.1, 0.1, 0.04, 0.85], zorder=10, anchor="N")
+	image_axis.imshow(img1)
+	image_axis.axis('off')
+
+	image_axis = fig.add_axes([0.1,-.425, 0.04, 0.85], zorder=10, anchor="N")
+	image_axis.imshow(img2)
+	image_axis.axis('off')
+	"""
+	plt.tight_layout()
+
+	if save:
+		plt.savefig(output_path,dpi=600)
+	else:
+		plt.show()
+
+
 def pop_means_sem(df,y_label,feat,output_path='D://',save=False):
 	
 	hlidx = df.cell == 'hl60'
@@ -402,7 +550,7 @@ def heatmat_pop(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False):
 	#axs[0].set_ylim([0.8,1.6])
 
 	ax1.set_ylabel(ylabel,fontsize=20)
-	ax1.set_title('HL 60', fontsize=20)
+	ax1.set_title('HL60', fontsize=20)
 
 	x = df[df.cell=='hl60d'][xfeat].to_numpy()
 	y = df[df.cell=='hl60d'][yfeat].to_numpy()
@@ -413,7 +561,7 @@ def heatmat_pop(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False):
 
 	ax2.scatter(x, y, c=z, s=100, edgecolor=None)
 	ax2.set_xlabel(xlabel,fontsize=20)
-	ax2.set_title('HL 60d',fontsize=20)
+	ax2.set_title('HL60d',fontsize=20)
 
 	#ax2.set_ylim([.8,2.2])
 	ax2.set_xlim([5,8])
@@ -438,7 +586,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 
 	fig,ax = plt.subplots(4,3,figsize=set_size(469.7,fraction=1,hratio=1.5,subplots=(4,3)))
 
-
+	label = ['a)','b)','c)','d)']
 	for row in range(len(yfeat)):
 
 		#ax[row,0] = fig.add_subplot(len(yfeat),3,(1+row*3))
@@ -458,9 +606,7 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		
 		
 		ax[row,0].set_ylabel(ylabel[row],fontsize=12)
-
-
-
+		ax[row,0].text(-0.3, 1.15, label[row], transform=ax[row,0].transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
 
 		x = df[df.cell=='hl60d'][xfeat].to_numpy()
 		y = df[df.cell=='hl60d'][yfeat[row]].to_numpy()
@@ -471,8 +617,6 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		ax[row,1].scatter(x, y, c=z, s=10, edgecolor=None,cmap='jet')
 		#ax2.set_xlabel(xlabel)
 		#ax2.set_ylabel(ylabel,fontsize=20)
-
-
 
 
 		if (row==2):
@@ -505,17 +649,20 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		hlidx = df.cell == 'hl60'
 		hldidx = df.cell == 'hl60d'
 
-		x = ['HL 60','HL 60d']
+		x = ['HL60','HL60d']
 		y = [df[hlidx][yfeat[row]].mean(),df[hldidx][yfeat[row]].mean()]
-		e = [stats.sem(df[hlidx][yfeat[row]]),stats.sem(df[hldidx][yfeat[row]])]
-     
+		if (row==1)|(row==0):
+			e = [np.round(stats.sem(df[hlidx][yfeat[row]]),2),np.round(stats.sem(df[hldidx][yfeat[row]]),2)]
+		else:
+			e = [np.round(stats.sem(df[hlidx][yfeat[row]]),5),np.round(stats.sem(df[hldidx][yfeat[row]]),5)]
+
 		ax[row,2].errorbar([1,3], y, e, marker="o",linestyle='',markersize='6', capsize=4)
 
 		# place the ticks at center by widening the plot
 		ax[row,2].set_xlim((0, 4))
 		# fix ticks at the number encoding for each class
 		ax[row,2].set_xticks([1,3])
-		ax[row,2].set_xticklabels(['hl60','hl60d'],fontsize=12)
+		ax[row,2].set_xticklabels(['HL60','HL60d'],fontsize=12)
 		# name the numbers
 		#ax[row,2].yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
 
@@ -540,8 +687,8 @@ def heatmap_pop_full(df,xfeat,yfeat,ylabel,xlabel,output_path='D://',save=False)
 		ax[row,0].yaxis.set_major_locator(plt.MaxNLocator(5))
 		ax[row,2].yaxis.set_major_locator(plt.MaxNLocator(5))
 		if row==0:
-			ax[row,0].set_title('HL 60', fontsize=12)
-			ax[row,1].set_title('HL 60d', fontsize=12)
+			ax[row,0].set_title('HL60', fontsize=12)
+			ax[row,1].set_title('HL60d', fontsize=12)
 
 		if row == len(yfeat)-1:
 			ax[row,1].set_xlabel(xlabel,fontsize=12)
