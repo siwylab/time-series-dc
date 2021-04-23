@@ -327,7 +327,7 @@ def feat_x_sub_fit(df,output_path,y_label,feature='aspect',trend=False,save=Fals
 	ax3.set_xlim([-20,170])
 	ax3.set_ylim([0.9,1.7])
 
-	ax3.set_ylabel('Aspect Ratio',size=12)
+	ax3.set_ylabel('AR',size=12)
 
 	ax3.xaxis.set_tick_params(labelsize=12)
 	ax3.yaxis.set_tick_params(labelsize=12)
@@ -372,17 +372,17 @@ def feat_x_sub_fit(df,output_path,y_label,feature='aspect',trend=False,save=Fals
 
 	ax3.text(x1+2, (row.nar2_asp+1)/2, 'AR2', horizontalalignment='left', 
 		verticalalignment='center',fontsize=12,family='Arial')
-	ax3.set_xlabel('X postion ($\mu$m)',size=12)
+	ax3.set_xlabel('X position ($\mu$m)',size=12)
 	xposition = [0,150]
 	for xc in xposition:
 		ax1.axvline(x=xc, color='r', linestyle='--',lw=2)
 		ax2.axvline(x=xc, color='r', linestyle='--',lw=2)
 		ax3.axvline(x=xc, color='r', linestyle='--',lw=2)
 
-	ax1.set_xlabel('X postion ($\mu$m)',size=axis_size)
+	ax1.set_xlabel('X position ($\mu$m)',size=axis_size)
 	ax1.set_ylabel(y_label,size=axis_size)
 
-	ax2.set_xlabel('X postion ($\mu$m)',size=axis_size)	
+	ax2.set_xlabel('X position ($\mu$m)',size=axis_size)	
 
 	ax1.set_xlim((-25,175))
 	ax2.set_xlim((-25,175))
@@ -398,13 +398,13 @@ def feat_x_sub_fit(df,output_path,y_label,feature='aspect',trend=False,save=Fals
 
 	ax1.text(-0.05, 1.15, 'a)', transform=ax1.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
 	ax2.text(-0.05, 1.15, 'b)', transform=ax2.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
-	ax3.text(-0.05, 1.15, 'c)', transform=ax3.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
+	ax3.text(-0.025, 1.15, 'c)', transform=ax3.transAxes,fontsize=16, fontweight='bold', va='top', ha='right')
 	
 	ax3.scatter(row.xcm_um,row.aspect,color='black',s=32)
 	ax3.set_xlim([-20,170])
 	ax3.set_ylim([0.9,1.7])
 
-	ax3.set_ylabel('Aspect Ratio',size=12)
+	ax3.set_ylabel('AR',size=12)
 
 	ax3.xaxis.set_tick_params(labelsize=12)
 	ax3.yaxis.set_tick_params(labelsize=12)
