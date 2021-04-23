@@ -53,7 +53,7 @@ plt.savefig('deep_learning_roc.eps', format='eps')
 plt.show()
 plt.close()
 
-plt.bar(range(3), [svm_accuracy, gru_accuracy, cnn_gru_accuracy], tick_label=['SVM', 'GRU', 'CNN_GRU'])
+plt.bar(range(3), [svm_accuracy, gru_accuracy, cnn_gru_accuracy], tick_label=['SVM', 'GRU', 'CNN_GRU'], width=0.4)
 plt.ylabel('Accuracy (Percent)', fontsize=9)
 
 plt.xticks(fontsize=8)
