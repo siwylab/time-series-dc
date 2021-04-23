@@ -139,22 +139,27 @@ def raw_frame(file_path, tf, width=880, height=140):
     return frame
 
 
-def raw_bbox(row, back_sub=False, tf_back=0):
-    file_path = 'D:/' + row.date + '/' + row.cell + '/25_50_25x150/oi/' + row.run + '/bin/test_camera_0.raw'
+def raw_bbox(row,back_sub = False,tf_back=0,cav=True,idx=0):
 
-    idx = row.cav1_min_arg
-    tf = row.tf[idx]
+	file_path = 'D:/' + row.date + '/' + row.cell + '/25_50_25x150/oi/' + row.run + '/bin/test_camera_0.raw'
 
-    frame = raw_frame(file_path, tf)
-    mask = row['mask'][idx]
+	if cav:
+		idx = row.cav1_min_arg
+		
+	tf = row.tf[idx]
+	
+	frame = raw_frame(file_path,tf)
+	mask = row['mask'][idx]
 
-    if back_sub:
-        temp_frame = raw_frame(file_path, tf_back)
-        frame = frame - temp_frame
+	if back_sub:
 
-    ystart, xstart, yend, xend = extract_bboxes_uniform(mask)
+		temp_frame = raw_frame(file_path, tf_back)
 
-    return frame[ystart:yend, xstart:xend]
+		frame = frame - temp_frame
+
+	ystart, xstart, yend, xend = extract_bboxes_uniform(mask)
+
+	return frame[ystart:yend, xstart:xend]
 
 
 def masked_raw_bbox(row):
