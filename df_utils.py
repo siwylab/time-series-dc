@@ -151,9 +151,11 @@ def raw_bbox(row,back_sub = False,tf_back=0,cav=True,idx=0):
 	frame = raw_frame(file_path,tf)
 	mask = row['mask'][idx]
 
-    if back_sub:
-    	temp_frame = raw_frame(file_path, tf_back)
-    	frame = frame - temp_frame
+	if back_sub:
+
+		temp_frame = raw_frame(file_path, tf_back)
+
+		frame = frame - temp_frame
 
 	ystart, xstart, yend, xend = extract_bboxes_uniform(mask)
 
