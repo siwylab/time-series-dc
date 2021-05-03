@@ -5,15 +5,27 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
 import os
-import sklearn
+import pandas as pd
+import sys
+# Import df_utils
+ROOT_DIR = os.path.abspath("../../")
+sys.path.append(ROOT_DIR)
+import df_utils
 
 # Load dataset
-x = np.load('/home/dan/Documents/siwylab/AWS/sequential_x.npy')
-y = np.load('/home/dan/Documents/siwylab/AWS/sequential_y.npy')
+df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
+
+x, y = df_utils.extract_sequential_features(df)
 
 # Split test and train data
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
+
+print(x_train.shape)
+print(y_test.shape)
+print(y_train.shape)
+print(y_val.shape)
+# sys.exit()
 
 # Use function for making specific models, allows model architectures to be recreated with random parameters for
 # testing purposes
@@ -21,10 +33,10 @@ x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, ran
 
 def create_model():
     _model = tf.keras.models.Sequential()
-    _model.add(tf.keras.Input((35, 4)))
-    _model.add(layers.Conv1D(16, 10, activation='relu'))
-    _model.add(layers.Conv1D(16, 10, activation='relu'))
-    _model.add(layers.Conv1D(16, 10, activation='relu'))
+    _model.add(layers.Conv1D(filters=16, kernel_size=10, activation='relu', input_shape=x_train.shape[1:]))
+    _model.add(layers.Conv1D(filters=16, kernel_size=10, activation='relu'))
+    _model.add(layers.Conv1D(filters=16, kernel_size=10, activation='relu'))
+    _model.add(layers.Flatten())
     _model.add(layers.Dense(16, activation='relu'))
     _model.add(layers.Dense(16, activation='relu'))
     _model.add(layers.Dense(1, activation='sigmoid'))
@@ -36,6 +48,7 @@ def create_model():
 
 
 model = create_model()
+print(model.summary())
 base_path = os.getcwd()
 checkpoint_path = "training_1/cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)

@@ -30,14 +30,20 @@ df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run ==
 df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
 df.dropna(inplace=True)
 
+
 # Extract features
 x = df[feature_list].to_numpy()
 y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
-x_std = scalar.fit_transform(x)
-x_train, x_val, y_train, y_val = train_test_split(x_std, y, test_size=0.3, random_state=123)
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
+
+# Fit scalar on training, apply transformation to val/test
+scalar.fit(x_train)
+x_train = scalar.transform(x_train)
+x_val = scalar.transform(x_val)
+
 x_val, x_test, y_val, y_test = train_test_split(x_val, y_val, test_size=0.5, random_state=123)
 
 # Iterate over models and plot roc
@@ -79,7 +85,7 @@ plt.legend(loc='best', prop={'size': 12})
 plt.tight_layout()
 
 plt.show()
-plt.savefig('sklearn_roc.eps', format='eps')
+plt.savefig('sklearn_roc.png', format='png')
 
 plt.close()
 fig = plt.figure(figsize=(5, 2.5))
