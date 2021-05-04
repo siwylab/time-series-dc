@@ -45,6 +45,7 @@ plt.legend(loc='best')
 plt.savefig('sequential_roc.png', format='png')
 plt.show()
 plt.close()
-
+fig = plt.figure(figsize=(5, 2.5))
 plt.bar(range(3), [onedcnn_accuracy, lstm_accuracy, gru_accuracy], tick_label=['1D CNN', 'LSTM', 'GRU'])
+plt.savefig('sequential_bar.png', format='png')
 plt.show()
