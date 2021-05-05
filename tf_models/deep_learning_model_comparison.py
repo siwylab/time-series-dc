@@ -32,11 +32,6 @@ svm_fpr = np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_fpr.csv')
 svm_tpr = np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_tpr.csv'))
 svm_auc = float(np.loadtxt(os.path.join(ROOT_DIR, 'sklearn_models/svm', 'svm_auc.csv')))
 
-# cnn_gru_folds = [0.9401993155,
-#                   0.9399999976,
-#                   0.926666677,
-#                   0.9433333278,
-#                   0.9399999976]
 
 # Obtain fpr, tpr
 plt.plot(svm_fpr, svm_tpr, label='SVM' + ' (AUC: ' + str(round(svm_auc, 2)) + ')')
