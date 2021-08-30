@@ -256,13 +256,6 @@ def extract_sequential_features(df, feature_list=None):
     if feature_list is None:
         feature_list = ['aspect', 'perimeter', 'area', 'deform']
 
-    # Filter df
-    df = filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
-    df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
-    df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
-    df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
-    df.dropna(inplace=True)
-
     x_min = -30
     x_max = 170
 
@@ -271,7 +264,8 @@ def extract_sequential_features(df, feature_list=None):
     df['x_end'] = df.apply(lambda a: np.argmin(np.abs(a['xcm_um'] - x_max)), axis=1)
 
     lstm_x = pad_columns(feature_list, df)
-    lstm_y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+    class_dict = {'hl60': 0, 'hl60d': 1, 'hl60n': 2}
+    lstm_y = df.apply(lambda a: class_dict[a['cell']], axis=1).to_numpy()
 
     assert not np.any(np.argwhere(np.isnan(lstm_x)))
     assert not np.any(np.argwhere(np.isnan(lstm_y)))

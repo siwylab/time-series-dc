@@ -21,8 +21,8 @@ df.dropna(inplace=True)
 
 # Extract features
 x = df[feature_list].to_numpy()
-y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
-
+class_dict = {'hl60': 0, 'hl60d': 1, 'hl60n': 2}
+y = df.apply(lambda a: class_dict[a['cell']], axis=1).to_numpy()
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.3, random_state=123)
@@ -38,7 +38,7 @@ score = {}
 
 depth = np.arange(1, 30, 5)
 for d in depth:
-    clf = RandomForestClassifier(max_depth=d, criterion='gini', random_state=123)
+    clf = RandomForestClassifier(max_depth=d, random_state=123)
     clf.fit(x_train, y_train.ravel())
     score[str(d)] = clf.score(x_val, y_val)
 
@@ -51,9 +51,5 @@ print('Depth: ', d)
 clf = RandomForestClassifier(max_depth=int(d), criterion='gini', random_state=123)
 clf.fit(x_train, y_train.ravel())
 print(clf.score(x_test, y_test))
-
-sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
-plt.title('RF' + ' D: ' + str(d))
-plt.savefig('random_forest_roc.png', dpi=300)
 
 pickle.dump(clf, open('random_forest.pkl', 'wb'))

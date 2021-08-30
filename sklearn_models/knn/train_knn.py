@@ -21,7 +21,8 @@ df.dropna(inplace=True)
 
 # Extract features
 x = df[feature_list].to_numpy()
-y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+class_dict = {'hl60': 0, 'hl60d': 1, 'hl60n': 2}
+y = df.apply(lambda a: class_dict[a['cell']], axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
@@ -52,9 +53,5 @@ print('N: ', n, '\n', 'Leaf size: ', leaf)
 clf = KNeighborsClassifier(n_neighbors=int(n), leaf_size=int(leaf))
 clf.fit(x_train, y_train.ravel())
 print(clf.score(x_test, y_test))
-
-sklearn.metrics.plot_roc_curve(clf, x_test, y_test)
-plt.title('k Nearest Neighbors' + ' K: ' + str(n) + ' Leaf Size: ' + str(leaf))
-plt.savefig('knn_roc.png', dpi=300)
 
 pickle.dump(clf, open('knn.pkl', 'wb'))

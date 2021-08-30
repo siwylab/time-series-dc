@@ -18,18 +18,16 @@ import df_utils
 feature_dict = df_utils.read_feats()
 feature_list = list(feature_dict)
 feature_list_cleaned = [feature_dict[i] for i in list(feature_dict.keys())]
+print(feature_list_cleaned)
 
-# Load dataset
+# Load predetermined features from dataset
 df = pd.read_pickle(os.path.join(ROOT_DIR, 'FINAL_DF_light'))
-df = df_utils.filter_df(df, ymax=5, max_ar=1.1, radius_std=3)
-df = df[(df.cell == 'hl60') | (df.cell == 'hl60d')]
-df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-3-20') & (df.run == '0'))]
-df = df[np.logical_not((df.cell == 'hl60') & (df.date == '11-5-20') & (df.run == '3'))]
 df.dropna(inplace=True)
 
 # Extract features
 x = df[feature_list].to_numpy()
-y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+class_dict = {'hl60': 0, 'hl60d': 1, 'hl60n': 2}
+y = df.apply(lambda a: class_dict[a['cell']], axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
@@ -77,5 +75,5 @@ shap.summary_plot(shap_values[1], x_test, feature_names=feature_list_cleaned, pl
 plt.xticks(fontsize=16)
 plt.yticks(fontsize=16)
 plt.tight_layout()
-plt.savefig('feature_importance.eps', format='eps')
+plt.savefig('feature_importance.png', format='png')
 

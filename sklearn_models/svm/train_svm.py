@@ -21,7 +21,8 @@ df.dropna(inplace=True)
 
 # Extract features
 x = df[feature_list].to_numpy()
-y = df.apply(lambda a: int(a['cell'] == 'hl60'), axis=1).to_numpy()
+class_dict = {'hl60': 0, 'hl60d': 1, 'hl60n': 2}
+y = df.apply(lambda a: class_dict[a['cell']], axis=1).to_numpy()
 
 # Normalize and standardize first
 scalar = sklearn.preprocessing.StandardScaler()
@@ -60,9 +61,5 @@ print('C: ', c, '\n', 'Kernel: ', k, '\n', 'D: ', d, '\n')
 svm_clf = svm.SVC(C=c, kernel=k, degree=d, random_state=123, probability=True)
 svm_clf.fit(x_train, y_train.ravel())
 print(svm_clf.score(x_test, y_test))
-
-sklearn.metrics.plot_roc_curve(svm_clf, x_test, y_test.ravel())
-plt.title('SVM' + ' C: ' + str(round(c, 2)) + ' Kernel: ' + k + ' D: ' + str(d))
-plt.savefig('svm_roc.png', dpi=300)
 
 pickle.dump(svm_clf, open('svm.pkl', 'wb'))
